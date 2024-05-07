@@ -83,6 +83,6 @@ public class GameText : MonoBehaviour
         yield return new WaitForSeconds(5);
 
         // ending 전환
-        SceneManager.LoadScene("EndingScene");
+        SceneManager.LoadScene("Result");
     }
 }

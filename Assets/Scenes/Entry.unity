@@ -619,8 +619,8 @@ MonoBehaviour:
     m_Bottom: 70
   m_ChildAlignment: 7
   m_Spacing: 70
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
@@ -689,7 +689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12eab714118037041b15cdc31380d752, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _map: {fileID: 0}
+  _map: {fileID: 4914130998142584461, guid: 0077cb178b25a2b4e9da8ac6fafa24b4, type: 3}
   column: 0
   row: 0
   p1Position: {x: 0, y: 0}
@@ -709,10 +709,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerObjects:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 4280992568745092791, guid: 80a6f6450f09bb540b62893fe456513b, type: 3}
+  - {fileID: 4280992568745092791, guid: 80a6f6450f09bb540b62893fe456513b, type: 3}
+  - {fileID: 4280992568745092791, guid: 80a6f6450f09bb540b62893fe456513b, type: 3}
+  - {fileID: 4280992568745092791, guid: 80a6f6450f09bb540b62893fe456513b, type: 3}
 --- !u!114 &1321589923
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 6710023871409022330}
   - component: {fileID: 1917515205516901294}
   - component: {fileID: 3409901712589641007}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Silver
-  m_TagString: Untagged
+  m_TagString: Items
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
