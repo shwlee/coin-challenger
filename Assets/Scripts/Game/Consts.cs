@@ -42,7 +42,7 @@ public enum GameMode
 
 public enum CoinType
 {
-    Cooper = 10,
+    Copper = 10,
     Silver = 30,
     Gold = 100,
     Diamond = 200,

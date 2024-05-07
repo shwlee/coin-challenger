@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerInfoController : MonoBehaviour
+public class InGamePlayerInfoController : MonoBehaviour
 {
     public Image Thumbnail;
     public TextMeshProUGUI Name;

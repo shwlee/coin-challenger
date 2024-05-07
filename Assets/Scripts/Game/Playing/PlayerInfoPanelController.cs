@@ -47,20 +47,20 @@ public class PlayerInfoPanelController : MonoBehaviour
         }
     }
 
-    private IEnumerable<PlayerInfoController> GetOrderedAllPlayerInfo()
+    private IEnumerable<InGamePlayerInfoController> GetOrderedAllPlayerInfo()
     {
-        var children = new List<PlayerInfoController>();
+        var children = new List<InGamePlayerInfoController>();
         var count = InfoPanel.transform.childCount;
         for (int i = 0; i < count; i++)
         {
             var child = InfoPanel.transform.GetChild(i);
-            children.Add(child.gameObject.GetComponent<PlayerInfoController>());
+            children.Add(child.gameObject.GetComponent<InGamePlayerInfoController>());
         }
 
         return children;
     }
 
-    private void RelocateSibling(IEnumerable<PlayerInfoController> allPlayerInfos)
+    private void RelocateSibling(IEnumerable<InGamePlayerInfoController> allPlayerInfos)
     {
         var reordered = allPlayerInfos.OrderByDescending(info => info._score);
         for (int i = allPlayerInfos.Count() - 1; i > 0; i--)

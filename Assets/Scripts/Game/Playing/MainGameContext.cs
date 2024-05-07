@@ -32,7 +32,7 @@ public class MainGameContext : MonoBehaviour
         foreach (var playerContext in playerContexts)
         {
             var playerInfo = Instantiate(PlayerInfoPrefab);
-            var infoController = playerInfo.GetComponent<PlayerInfoController>();
+            var infoController = playerInfo.GetComponent<InGamePlayerInfoController>();
             infoController.InitPlayerInfo(playerContext);
 
             playerInfo.transform.SetParent(PlayerInfoPanel.transform, false);

@@ -296,7 +296,7 @@ public class GameManager : MonoBehaviour
         while (GameInfoService.Instance.IsClearAllCoins() is false)
         {
             // 제일 싼 코인부터 제거.
-            yield return StartCoroutine(RemoveCoins(CoinType.Cooper, 0.3f));
+            yield return StartCoroutine(RemoveCoins(CoinType.Copper, 0.3f));
             yield return StartCoroutine(RemoveCoins(CoinType.Silver, 0.7f));
             yield return StartCoroutine(RemoveCoins(CoinType.Gold, 1.0f));
             yield return StartCoroutine(RemoveCoins(CoinType.Diamond, 1.3f));
