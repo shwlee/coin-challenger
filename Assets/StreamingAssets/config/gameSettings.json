@@ -1,6 +1,6 @@
 {
-    "CsharpHostport": 0,
-    "CsharpHostPath": "",
-    "JsHostport": 0,
-    "JsHostPath": ""
+    "CsharpHostPath": "Runners/CSharpHost/CSharpHost.exe",
+    "CsharpHostport": 50109,
+    "JsHostPath": "Runners/JsHost/jsHost.exe",
+    "JsHostport": 50209
 }
