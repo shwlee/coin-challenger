@@ -47,6 +47,8 @@ public class GameManager : MonoBehaviour
         _mapGenerator = GetComponent<MapGenerator>();
         _playerManager = GetComponent<PlayerManager>();
         LoadSettings();
+
+        runningTimeBeforeHurryUp = Settings.RunningTime > 0 ? Settings.RunningTime : 120;
     }
 
     private void LoadSettings()
