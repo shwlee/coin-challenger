@@ -134,7 +134,7 @@ zip 파일이 게임 실행 바이너리를 압축한 파일입니다. 요 파�
 
 최초 실행 시 플레이어 호스트의 실행 등록이 필요합니다.(Windows11 기준, 아래와 같은 창이 뜨면 `허용` 을 눌러주세요.)
 
-![alt text](coin-challenger-runnerhost.png)
+![alt text](./resources/coin-challenger-runnerhost.png)
 
 <br>
 <br>
