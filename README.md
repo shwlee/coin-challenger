@@ -190,7 +190,7 @@ zip 파일이 게임 실행 바이너리를 압축한 파일입니다. 요 파�
 
 위 폴더에 보관해주시면 됩니다.(이미 샘플 코드가 들어있을 거예요.)
 
-4개 이상의 파일이 이미 들어있다 정상적으로 로딩되지 않을 수도 있으니    
+4개 이상의 파일이 이미 들어있다면 정상적으로 로딩되지 않을 수도 있으니    
 위 폴더에 보관되는 파일 개수는 4개 이하로 유지하는 것을 권장합니다.
 
 이제 알고리즘 작성을 위한 자세한 가이드입니다.
@@ -200,7 +200,8 @@ zip 파일이 게임 실행 바이너리를 압축한 파일입니다. 요 파�
 
 ### <알고리즘 코드 작성 가이드 입니다.>
 
-먼저 큰 틀에서 플레이어 코드(알고리즘 코드)를 호출하는 구조를 설명합니다. 플레이어 로딩 이후 게임 진행 과정은 다음과 같습니다.
+먼저 큰 틀에서 플레이어 코드(알고리즘 코드)를 호출하는 구조를 설명합니다.    
+플레이어 로딩 이후 게임 진행 과정은 다음과 같습니다.
 
 ```
 게임 프로세스 ->   
@@ -280,38 +281,38 @@ using System;
 
 namespace CSharpPlayer
 {
-	/// <summary>
-	/// 코드 sample 입니다. 별도의 파일에 다시 작성해주세요.
-	/// <para>네임스페이스는 `CSharpPlayer`, 클래스 이름은 `Player` 로 고정해주세요.(필수)</para>
-	/// <para>필수 메서드 GetName(), Initialize(), MoveNext()의 접근제한자를 public 으로 지정해주세요.</para>
-	/// </summary>
-	public class Player
-	{
-		private int _myNumber;
-		private int _column;
-		private int _row;
+    /// <summary>
+    /// 코드 sample 입니다. 별도의 파일에 다시 작성해주세요.
+    /// <para>네임스페이스는 `CSharpPlayer`, 클래스 이름은 `Player` 로 고정해주세요.(필수)</para>
+    /// <para>필수 메서드 GetName(), Initialize(), MoveNext()의 접근제한자를 public 으로 지정해주세요.</para>
+    /// </summary>
+    public class Player
+    {
+        private int _myNumber;
+        private int _column;
+        private int _row;
 
         /// <summary>
         /// Player 를 초기화 합니다. 게임 환경을 인자로 전달받습니다. 전달받은 인자는 게임 동안 유지해야합니다.
         /// </summary>
         /// <param name="myNumber">배정받은 번호.(플레이 순서)</param>
         /// <param name="column">현재 생성된 보드의 열.</param>
-        /// <param name="row">현재 생성된 보드의 행.</param>		
-		public void Initialize(int myNumber, int column, int row)
-		{
-			_myNumber = myNumber;
-			_column = column;
-			_row = row;
-		}
+        /// <param name="row">현재 생성된 보드의 행.</param>
+        public void Initialize(int myNumber, int column, int row)
+        {
+            _myNumber = myNumber;
+            _column = column;
+            _row = row;
+        }
 
         /// <summary>
         /// Player 의 이름을 반환합니다. 현재 플레이어의 이름을 하드코딩하여 반환합니다.
         /// </summary>
         /// <returns>현재 플레이어 이름.</returns>
-		public string GetName()
-		{
-			return "c# player";
-		}
+        public string GetName()
+        {
+            return "c# player";
+        }
 
         
         /// <summary>
@@ -321,13 +322,13 @@ namespace CSharpPlayer
         /// <param name="map">1차원 배열로 표현된 현재 map 정보.</param>
         /// <param name="myPosition">현재 플레이어의 위치. map 배열의 인덱스로 표시됨.</param>    
         /// <returns>이번 프레임에 진행할 방향. left, up, right, down 순서로 0, 1, 2, 3 으로 표현.</returns>
-		public int MoveNext(int[] map, int myPosition)
-		{
-			var random = new Random();
-			var direction = random.Next(4);
-			return direction;
-		}        	
-	}
+        public int MoveNext(int[] map, int myPosition)
+        {
+            var random = new Random();
+            var direction = random.Next(4);
+            return direction;
+        }
+    }
 }
 
 ```
@@ -343,12 +344,12 @@ namespace CSharpPlayer
 column: 6    
 row: 6
 ```
-0   	0   	-1   	-1  	10   	0
--1  	0       30      30    	10   	-1
-0   	0   	100   	100  	30   	10
-0   	0  	    100  	0     	0     	0
--1   	0 	    0 	    0   	0   	-1
-0   	0   	-1   	-1  	0   	0
+0       0       -1      -1      10      0
+-1      0       30      30      10      -1
+0       0       100     100     30      10
+0       0       100     0       0       0
+-1      0       0       0       0       -1
+0       0       -1      -1      0       0
 ```
 
 0 은 이동 가능한 공간, -1 은 벽(이동 불가), 0보다 큰 나머지 숫자는 코인입니다.
@@ -366,19 +367,18 @@ row: 6
 
 ```
 
-이들 코인은 map 정보에서 직접 수치로 표현됩니다.(예시> gold 코인이 int 배열에서 100 으로 표시됨.)
+이들 코인은 map 정보에서 직접 수치로 표현됩니다.(예시> gold 코인이 맵 정보 -int 배열- 에서 100 으로 표시됨.)
 
 <br>
 <br>
 
-실제 호출 상황을 예로 들어보면 (!! 위 맵으로 게임이 진행될 경우 !!)
-
-
+실제 호출 상황을 예로 들어보면 (위 맵으로 게임이 진행될 경우)
 
 매턴마다 플레이어 코드의 `MoveNext(int[] map, int myPosition)` 메서드 호출이 일어납니다.    
 이 때 현재 맵의 정보가 `int 배열` 형태로 전달되고, 현재 플레이어의 위치 정보 역시 맵 배열의 인덱스 값으로 함께 전달됩니다.
 
 즉, 아래와 같은 형식으로 호출됩니다.
+
 ```csharp
 int[] map = new[] {0,0,-1,-1,10,0,-1,0,30,30,10,-1,0,0,100,100,30,10,0,0,100,0,0,0,-1,0,0,0,0,-1,0,0,-1,-1,0,0};
 var direction = MoveNext(map, 21); // 플레이어가 21번째 인덱스 위치에 있음.
