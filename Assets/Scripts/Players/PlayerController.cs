@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
 
     public int Position;
 
+    private int PaneltyDelay => (int)(_moveTime * 1000);
+
     public void SetPlayerModule(IPlayer module) => _player = module;
 
     // Start is called before the first frame update
@@ -69,11 +71,15 @@ public class PlayerController : MonoBehaviour
         var y = RoundToHalf(transform.position.y);
         var current = CoordinateService.ToIndex(column, row, x, y);
 
-        var direction =
-            GameManager.Instance.Mode is not GameMode.Test ? await CalcToWhere(map, current) : GetDirectionByInput();
+        var direction = IsTestMode() is false ? await CalcToWhere(map, current) : GetDirectionByInput();
 
         if (direction is null)
         {
+            if (IsTestMode() is false)
+            {
+                await UniTask.Delay(PaneltyDelay);
+            }
+
             _isMoving = false;
             return;
         }
@@ -83,6 +89,7 @@ public class PlayerController : MonoBehaviour
         var moveTo = ConvertFromDirection(direction.Value);
         if (CanMoveNext(moveTo) is false)
         {
+            await UniTask.Delay(PaneltyDelay);
             _isMoving = false;
             return;
         }
@@ -92,6 +99,9 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(MoveSmoothGrid(moveTo));
         }
     }
+
+    private bool IsTestMode()
+        => GameManager.Instance.Mode is GameMode.Test;
 
     private bool CanMoveNext(Vector2 direction)
         => Physics2D.Raycast(transform.position, direction, _layDistance, _hitBlockMask).transform is null;
