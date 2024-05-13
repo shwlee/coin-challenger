@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     private PlayerManager _playerManager;
 
     private bool _isHurryUpProcedureStarted;
+    private bool _isClosing;
 
     void Awake()
     {
@@ -112,7 +113,7 @@ public class GameManager : MonoBehaviour
                 playerPositions.Add(0, _mapGenerator.p1Position);
                 playerPositions.Add(1, _mapGenerator.p2Position);
                 playerPositions.Add(2, _mapGenerator.p3Position);
-                playerPositions.Add(3, _mapGenerator.p4Position);                
+                playerPositions.Add(3, _mapGenerator.p4Position);
                 break;
             case GameMode.Test: // test 는 무조건 1번자리에 배치.
             case GameMode.Single1:
@@ -127,7 +128,7 @@ public class GameManager : MonoBehaviour
             case GameMode.Single4:
                 playerPositions.Add(3, _mapGenerator.p4Position);
                 break;
-            default:                
+            default:
                 break;
         }
 
@@ -149,7 +150,16 @@ public class GameManager : MonoBehaviour
     public IEnumerable<int> GetPlayerRanking()
         => _playerManager.GetPlayerRanking();
 
-    void Update()
+    public async UniTask CloseAllPlayerHost()
+    {
+        var playerContexts = _playerManager.GetPlayerContexts();
+        foreach (var context in playerContexts)
+        {
+            await context.Player.CloseHost();
+        }
+    }
+
+    async void Update()
     {
         if (SceneManager.GetActiveScene().name != "Game")
         {
@@ -166,7 +176,7 @@ public class GameManager : MonoBehaviour
         }
         else if (Input.GetKey("escape"))
         {
-            ExitGame(); // 즉시 종료.
+            await ExitGame(); // 즉시 종료.
         }
     }
 
@@ -335,8 +345,17 @@ public class GameManager : MonoBehaviour
     public (int row, int column) GetGameGridRange()
         => (_mapGenerator.row, _mapGenerator.column);
 
-    public void ExitGame()
+    public async UniTask ExitGame()
     {
+        if (_isClosing)
+        {
+            return;
+        }
+
+        _isClosing = true;
+
+        await CloseAllPlayerHost();
+
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else

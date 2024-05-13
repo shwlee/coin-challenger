@@ -58,7 +58,7 @@ public class EntryLoader : MonoBehaviour
             }
             else if (Input.GetKeyDown(KeyCode.Escape))
             {
-                ExitGame();
+                await ExitGame();
                 return;
             }
             else
@@ -93,7 +93,7 @@ public class EntryLoader : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                ExitGame();
+                await ExitGame();
             }
         }
     }
@@ -143,12 +143,6 @@ public class EntryLoader : MonoBehaviour
         loadedPlayer.transform.SetParent(LoadedPlayerPanel.transform);
     }
 
-    public void ExitGame()
-    {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit(); // 어플리케이션 종료
-#endif
-    }
+    public UniTask ExitGame()
+        => GameManager.Instance.ExitGame();
 }
