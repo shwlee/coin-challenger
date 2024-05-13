@@ -603,6 +603,13 @@ nodejs 에서 module 로 사용하기 위해 class 로 작성해야하며, 최�
 gameSettings.json 은 호스트 실행 바이너리 위치와 호스트가 사용할 포트(port) 정보를 보관/조정합니다.    
 (기본 포트는 50109, 50209를 사용합니다.)
 
+ \* 참고    
+ C# 플레이어 호스트는 .NET8 런타임을 사용합니다. .NET8 framework-dependent 방식으로 빌드되어 있으므로 .NET8 런타임 or SDK 가 없으면 정상동작하지 않습니다.    
+ .NET8 런타임 설치를 먼저 진행해주세요.    
+ (https://dotnet.microsoft.com/ko-kr/download/dotnet/8.0 windows x64 버전이 필요합니다.)
+
+
+
 <br>
 <br>
 
