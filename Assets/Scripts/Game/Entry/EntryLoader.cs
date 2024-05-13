@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,8 +12,10 @@ public class EntryLoader : MonoBehaviour
     public TextMeshProUGUI InfoText;
     public TextMeshProUGUI PrepareText;
     public GameObject LoadedPlayerPrefab;
+    public GameObject LoadFailedPlayerPrefab;
 
     private bool _waitForGameModeSet = true;
+    private bool _loadAllPlayerSucceed;
     private bool _isReadyToStart;
 
     // Update is called once per frame
@@ -72,15 +76,19 @@ public class EntryLoader : MonoBehaviour
 
         if (_isReadyToStart)
         {
-            if (InfoText.gameObject.activeSelf is false) // key press display.
+            if (InfoText.gameObject.activeSelf is false) // enter key press display.
             {
+                InfoText.text = _loadAllPlayerSucceed ? "PRESS THE ENTER.." : "ERROR!!";
                 InfoText.gameObject.SetActive(true);
             }
 
-            if (Input.GetKeyDown(KeyCode.Return)) // game start.
+            if (_loadAllPlayerSucceed)
             {
-                SceneManager.LoadScene("Game");
-                return;
+                if (Input.GetKeyDown(KeyCode.Return)) // game start.
+                {
+                    SceneManager.LoadScene("Game");
+                    return;
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -108,14 +116,31 @@ public class EntryLoader : MonoBehaviour
         {
             await UniTask.Delay(500);
 
-            var loadedPlayer = Instantiate(LoadedPlayerPrefab);
-            var context = loadedPlayer.GetComponent<LoadedPlayerContext>();
-            await context.Set(player);
-
-            loadedPlayer.transform.SetParent(LoadedPlayerPanel.transform);
+            if (player.LoadSucceed is false)
+            {
+                await CreatePlayer<LoadFailedPlayerContext>(player, LoadFailedPlayerPrefab);
+            }
+            else
+            {
+                await CreatePlayer<LoadedPlayerContext>(player, LoadedPlayerPrefab);
+            }
         }
 
+        _loadAllPlayerSucceed = loadedPlayers.All(player => player.LoadSucceed);
+
         _isReadyToStart = true;
+    }
+
+    private async UniTask CreatePlayer<T>(PlayerContext player, GameObject prefab)
+    {
+        var loadedPlayer = Instantiate(prefab);
+        if (loadedPlayer.GetComponent<T>() is ILoadedPlayerContext context is false)
+        {
+            throw new Exception("failed to get playerContext");
+        }
+
+        await context.Set(player);
+        loadedPlayer.transform.SetParent(LoadedPlayerPanel.transform);
     }
 
     public void ExitGame()

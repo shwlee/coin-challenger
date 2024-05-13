@@ -677,6 +677,7 @@ MonoBehaviour:
   InfoText: {fileID: 1587711038}
   PrepareText: {fileID: 429658341}
   LoadedPlayerPrefab: {fileID: 6713436343768047769, guid: 867d2a50992f261458f3d04f7a21825b, type: 3}
+  LoadFailedPlayerPrefab: {fileID: 6544292521077362631, guid: 969151d6d8e3f8e4392bf76093a412a5, type: 3}
 --- !u!114 &1321589921
 MonoBehaviour:
   m_ObjectHideFlags: 0

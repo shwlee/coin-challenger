@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerContext
 {
+    public bool LoadSucceed { get; set; }
     public int Position { get; set; }
     public IPlayer Player { get; set; }
     public GameObject PlayerObject { get; set; }
@@ -11,4 +12,5 @@ public class PlayerContext
     public Vector3 IntiPosition { get; set; }
     public PlayerController Controller { get; set; }
     public int Score { get; set; }
+    public string FileName { get; set; }
 }

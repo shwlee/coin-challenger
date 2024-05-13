@@ -38,6 +38,7 @@ public class PlayerManager : MonoBehaviour
         var dummyPlayer = new DummyPlayer();
         var testPlayer = new PlayerContext
         {
+            LoadSucceed = true,
             Position = 0,
             Player = dummyPlayer,
             Name = await dummyPlayer.GetName(),
@@ -47,13 +48,20 @@ public class PlayerManager : MonoBehaviour
 
     private async UniTask LoadAllPlayers()
     {
-        // IPlayer 로딩.	
-        // TODO : 4명 제한. 4명 초과 시 게임 중단 기능 필요.
-        var files = LoadTargetFiles().OrderBy(_ => Random.Range(0, 3)).ToList(); // random 배치.        
-        for (var i = 0; i < files.Count; i++)
+        try
         {
-            var file = files[i];
-            await LoadPlayerContext(file, i);
+            // IPlayer 로딩.	
+            // TODO : 4명 제한. 4명 초과 시 게임 중단 기능 필요.
+            var files = LoadTargetFiles().OrderBy(_ => Random.Range(0, 3)).ToList(); // random 배치.        
+            for (var i = 0; i < files.Count; i++)
+            {
+                var file = files[i];
+                await LoadPlayerContext(file, i);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.Log(ex);
         }
 
         await SetDummy();
@@ -82,19 +90,31 @@ public class PlayerManager : MonoBehaviour
 
     private async UniTask LoadPlayerContext(string file, int index)
     {
-        var fullPath = Path.GetFullPath(file);
-        var player = await PlayerLoader.Load(index, fullPath);
-        if (player is null)
-        {
-            return;
-        }
-
         var playerContext = new PlayerContext
         {
             Position = index,
-            Player = player,
-            Name = await player.GetName(),
+            FileName = Path.GetFileName(file)
         };
+
+        try
+        {
+            var fullPath = Path.GetFullPath(file);
+            var player = await PlayerLoader.Load(index, fullPath);
+            if (player is null)
+            {
+                return;
+            }
+
+            playerContext.Player = player;
+            playerContext.Name = await player.GetName();
+            playerContext.LoadSucceed = true;
+        }
+        catch (System.Exception ex)
+        {
+            playerContext.LoadSucceed = false;
+            Debug.LogError(ex);
+        }
+
         _players.Add(index, playerContext);
     }
 
@@ -128,6 +148,7 @@ public class PlayerManager : MonoBehaviour
                 var dummyPlayer = new DummyPlayer();
                 var dummyContext = new PlayerContext
                 {
+                    LoadSucceed = true,
                     Position = i,
                     Player = dummyPlayer,
                     Name = $"{await dummyPlayer.GetName()}_{i}",

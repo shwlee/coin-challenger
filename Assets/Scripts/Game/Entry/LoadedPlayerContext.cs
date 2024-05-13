@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LoadedPlayerContext : MonoBehaviour
+public class LoadedPlayerContext : MonoBehaviour, ILoadedPlayerContext
 {
     public Image Thumbnail;
     public TextMeshProUGUI Name;
