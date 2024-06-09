@@ -32,10 +32,4 @@ public interface IPlayer
     /// <param name="currentPosition">현재 플레이어의 위치. map 배열의 인덱스로 표시됨.</param>    
     /// <returns>이번 프레임에 진행할 방향. left, up, right, down 순서오 0, 1, 2, 3 으로 표현.</returns>
     UniTask<int?> MoveNext(int[] map, int currentPosition);
-
-    /// <summary>
-    /// 게임 종료 시 RunnerHost 에 종료 메시지를 전달합니다.
-    /// </summary>
-    /// <returns></returns>
-    UniTask CloseHost();
 }

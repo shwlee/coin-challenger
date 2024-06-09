@@ -38,6 +38,11 @@ public partial class RunnerHostMediator
 
     internal async static UniTask CloseRunner(int port, string platform)
     {
+        if (GameManager.Instance.Settings.CloseWithoutPlayerHostExit)
+        {
+            return;
+        }
+
         var rootPath = string.Format(HostRoot, port, platform);
         var url = $"{rootPath}/{PartGame}/{Shutdown}";
         try
@@ -171,5 +176,21 @@ public partial class RunnerHostMediator
         _checked.Add(platform);
 
         await UniTask.Delay(500);
+    }
+
+    internal async static UniTask CleanupPlayerHost(int port, string platform)
+    {
+        var rootPath = string.Format(HostRoot, port, platform);
+        var url = $"{rootPath}/{PartGame}/{Cleanup}";
+        try
+        {
+            using var request = UnityWebRequest.Post(url, null, "application/json");
+            await request.SendWebRequest().WithCancellation(CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            throw;
+        }
     }
 }

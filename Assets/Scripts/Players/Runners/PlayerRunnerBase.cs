@@ -1,31 +1,35 @@
 using Cysharp.Threading.Tasks;
 using System;
 
-public abstract class PlayerRunnerBase : IPlayer
+public abstract class PlayerRunnerBase<T> : IPlayer
 {
-    private int _port;
+    public static int Port { get; private set; }
+    public static string Platform { get; private set; }
+    public static string HostPath { get; private set; }
+
     private int _myNumber;
-    private string _platform;
-    private string _hostPath;
 
     protected PlayerRunnerBase(int port, string platform, string hostPath)
     {
-        _port = port;
-        _platform = platform;
-        _hostPath = hostPath;
+        Port = port;
+        Platform = platform;
+        HostPath = hostPath;
     }
 
-    public UniTask CloseHost()
-        => RunnerHostMediator.CloseRunner(_port, _platform);
+    public static UniTask CloseHost()
+        => RunnerHostMediator.CloseRunner(Port, Platform);
+
+    public static UniTask CleanupHost()
+        => RunnerHostMediator.CleanupPlayerHost(Port, Platform);
 
     public UniTask<string> GetName()
-        => RunnerHostMediator.GetPlayerName(_port, _platform, _myNumber);
+        => RunnerHostMediator.GetPlayerName(Port, Platform, _myNumber);
 
     public UniTask Initialize(int column, int row)
-        => RunnerHostMediator.InitializePlayer(_port, _platform, _myNumber, column, row);
+        => RunnerHostMediator.InitializePlayer(Port, Platform, _myNumber, column, row);
 
     public UniTask<int?> MoveNext(int[] map, int currentPosition)
-        => RunnerHostMediator.GetMoveNextDirection(_port, _platform, _myNumber, map, currentPosition);
+        => RunnerHostMediator.GetMoveNextDirection(Port, Platform, _myNumber, map, currentPosition);
 
     public async virtual UniTask Setup(int myNumber, string filePath)
     {
@@ -33,23 +37,23 @@ public abstract class PlayerRunnerBase : IPlayer
 
         ThrowIfInitNotYet();
 
-        await RunnerHostMediator.PrepareRunnerHost(_port, _platform, _hostPath);
-        await RunnerHostMediator.LoadPlayerInstance(_port, _platform, myNumber, filePath);
+        await RunnerHostMediator.PrepareRunnerHost(Port, Platform, HostPath);
+        await RunnerHostMediator.LoadPlayerInstance(Port, Platform, myNumber, filePath);
     }
 
     private void ThrowIfInitNotYet()
     {
-        if (_port is 0)
+        if (Port is 0)
         {
             throw new Exception("_port not is set.");
         }
 
-        if (string.IsNullOrWhiteSpace(_platform))
+        if (string.IsNullOrWhiteSpace(Platform))
         {
             throw new Exception("_platform not is set.");
         }
 
-        if (string.IsNullOrWhiteSpace(_hostPath))
+        if (string.IsNullOrWhiteSpace(Platform))
         {
             throw new Exception("_hostPath not is set.");
         }

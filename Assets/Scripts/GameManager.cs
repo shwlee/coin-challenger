@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -153,9 +154,27 @@ public class GameManager : MonoBehaviour
     public async UniTask CloseAllPlayerHost()
     {
         var playerContexts = _playerManager.GetPlayerContexts();
-        foreach (var context in playerContexts)
+        // 종료 전 cleanup 호출.
+        var playerForms = playerContexts.Select(player => player.Player).ToList();
+        var playerGroups = playerForms.GroupBy(form => form.GetType());
+        foreach (var group in playerGroups)
         {
-            await context.Player.CloseHost();
+            var platform = group.Key;
+            switch (platform)
+            {
+                case Type _ when platform == typeof(CsPlayerRunner):
+                    await CsPlayerRunner.CleanupHost();
+                    await CsPlayerRunner.CloseHost();
+                    break;
+                case Type _ when platform == typeof(JsPlayerRunner):
+                    await JsPlayerRunner.CleanupHost();
+                    await JsPlayerRunner.CloseHost();
+                    break;
+                case Type _ when platform == typeof(DummyPlayer):
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 

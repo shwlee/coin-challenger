@@ -10,4 +10,6 @@ public class GameSettings
 
     public int JsHostport;
     public string JsHostPath;
+
+    public bool CloseWithoutPlayerHostExit;
 }

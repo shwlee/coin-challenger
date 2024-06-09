@@ -49,29 +49,12 @@ public class CloseGameService : MonoBehaviour
         }
     }
 
-    public void ExitGame()
+    public async void ExitGame()
     {
-        // RunnerHost 종료 처리.
-        CloseRunnerHost();
-
         // 결과를 파일로 저장한 후 종료한다.
         SaveResult();
-
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit(); // 어플리케이션 종료
-#endif
-    }
-
-    private void CloseRunnerHost()
-    {
-        var player = GameManager.Instance.GetAllPlayerContexts();
-        foreach (var context in player)
-        {
-            context.Player.CloseHost();
-        }
-    }
+        await GameManager.Instance.ExitGame();
+    }    
 
     private void SaveResult()
     {

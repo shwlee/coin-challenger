@@ -7,6 +7,7 @@ public partial class RunnerHostMediator
     private const string Healthy = "healthy";
     private const string Set = "set";
     private const string Shutdown = "shutdown";
+    private const string Cleanup = "cleanup";
 
     private const string LoadPlayer = "load";
     private const string InitPlayer = "init";

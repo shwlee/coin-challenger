@@ -3,5 +3,6 @@
     "CsharpHostPath": "Runners/CSharpHost/CSharpHost.exe",
     "CsharpHostport": 50109,
     "JsHostPath": "Runners/JsHost/jsHost.exe",
-    "JsHostport": 50209
+    "JsHostport": 50209,
+    "CloseWithoutPlayerHostExit" : true
 }
