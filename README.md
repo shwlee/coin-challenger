@@ -655,6 +655,7 @@ gameSettings.json 파일을 수정한 후 게임을 재시작하면, 수정된 �
 - C# 호스트 실행 port.(CsharpHostport)
 - javascript 호스트 바이너리 위치.(JsHostPath)
 - javascript 호스트 실행 port.(JsHostPath)
+- 게임 종료 시 플레이어 호스트를 함께 종료할 지 여부.(CloseWithoutPlayerHostExit)
 ```
 
 <br>
