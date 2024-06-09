@@ -56,9 +56,8 @@ public class EntryLoader : MonoBehaviour
             {
                 mode = GameMode.Contest;
             }
-            else if (Input.GetKeyDown(KeyCode.Escape))
+            else if (await Escape.ExitIfInputEscape())
             {
-                await ExitGame();
                 return;
             }
             else
@@ -91,9 +90,9 @@ public class EntryLoader : MonoBehaviour
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (await Escape.ExitIfInputEscape())
             {
-                await ExitGame();
+                return;
             }
         }
     }
@@ -143,6 +142,6 @@ public class EntryLoader : MonoBehaviour
         loadedPlayer.transform.SetParent(LoadedPlayerPanel.transform);
     }
 
-    public UniTask ExitGame()
-        => GameManager.Instance.ExitGame();
+    public UniTask ExitGame(bool isForcePlayerHostShutdown = false)
+        => GameManager.Instance.ExitGame(isForcePlayerHostShutdown);
 }

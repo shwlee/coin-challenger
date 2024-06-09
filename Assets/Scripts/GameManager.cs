@@ -151,12 +151,17 @@ public class GameManager : MonoBehaviour
     public IEnumerable<int> GetPlayerRanking()
         => _playerManager.GetPlayerRanking();
 
-    public async UniTask CloseAllPlayerHost()
+    public async UniTask CloseAllPlayerHost(bool isForcePlayerHostShutdown)
     {
         var playerContexts = _playerManager.GetPlayerContexts();
         // 종료 전 cleanup 호출.
         var playerForms = playerContexts.Select(player => player.Player).ToList();
         var playerGroups = playerForms.GroupBy(form => form.GetType());
+        if (isForcePlayerHostShutdown)
+        {
+            Settings.CloseWithoutPlayerHostExit = false;
+        }
+
         foreach (var group in playerGroups)
         {
             var platform = group.Key;
@@ -192,11 +197,10 @@ public class GameManager : MonoBehaviour
         if (Input.GetKey(KeyCode.Return))
         {
             SceneManager.LoadScene("Result");
+            return;
         }
-        else if (Input.GetKey("escape"))
-        {
-            await ExitGame(); // 즉시 종료.
-        }
+
+        await Escape.ExitIfInputEscape();
     }
 
     private void CheckPlayTime()
@@ -364,7 +368,7 @@ public class GameManager : MonoBehaviour
     public (int row, int column) GetGameGridRange()
         => (_mapGenerator.row, _mapGenerator.column);
 
-    public async UniTask ExitGame()
+    public async UniTask ExitGame(bool isForcePlayerHostShutdown = false)
     {
         if (_isClosing)
         {
@@ -373,7 +377,7 @@ public class GameManager : MonoBehaviour
 
         _isClosing = true;
 
-        await CloseAllPlayerHost();
+        await CloseAllPlayerHost(isForcePlayerHostShutdown);
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

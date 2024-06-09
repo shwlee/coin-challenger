@@ -41,20 +41,17 @@ public class CloseGameService : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    async void Update()
     {
-        if (Input.GetKey("escape"))
-        {
-            ExitGame();
-        }
+        await Escape.ExitIfInputEscape();
     }
 
-    public async void ExitGame()
+    public async void ExitGame(bool isForcePlayerHostShutdown = false)
     {
         // 결과를 파일로 저장한 후 종료한다.
         SaveResult();
         await GameManager.Instance.ExitGame();
-    }    
+    }
 
     private void SaveResult()
     {
