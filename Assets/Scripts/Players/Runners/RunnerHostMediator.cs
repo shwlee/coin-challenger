@@ -143,7 +143,7 @@ public partial class RunnerHostMediator
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            throw;
+            return -1; // 예외 대신 무조건 -1. -1 이면 1턴 쉰다.
         }
     }
 
