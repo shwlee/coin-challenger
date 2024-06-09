@@ -392,7 +392,7 @@ namespace CSharpPlayer
         /// </summary>
         /// <param name="map">1차원 배열로 표현된 현재 map 정보.</param>
         /// <param name="myPosition">현재 플레이어의 위치. map 배열의 인덱스로 표시됨.</param>    
-        /// <returns>이번 프레임에 진행할 방향. left, up, right, down 순서로 0, 1, 2, 3 으로 표현.</returns>
+        /// <returns>이번 프레임에 진행할 방향. left, up, right, down 순서로 0, 1, 2, 3 으로 표현. -1은 에러</returns>
         public int MoveNext(int[] map, int myPosition)
         {
             var random = new Random();
@@ -484,7 +484,16 @@ var direction = MoveNext(map, 21); // 플레이어가 21번째 인덱스 위치�
 
 <br>
 
-<span style="font-size:10;">화이팅</span>
+> *주의*    
+MoveNext() 의 반환값으로 -1 은 에러를 의미합니다.(정확히는 0보다 작은 수)    
+MoveNext()에서 -1 이 반환되면 플레이어틑 1턴을 쉬게 됩니다.(패널티!)    
+플레이어를 의도적으로 쉬게 하는 것이 아니라면 MoveNext() 에서 -1 을 반환하지 않게 하세요!
+
+<br>
+
+자 그럼
+
+<span style="font-size:10;">화이팅!</span>
 
 
 <br>
@@ -526,7 +535,7 @@ class JsRunner {
     // 결정 방향은 left, up, right, down 순서로 0, 1, 2, 3 정수로 표현해야합니다.// 
     // map: int[]  1차원 배열로 표현된 현재 map 정보.
     // myPosition:int 현재 플레이어의 위치. map 배열의 인덱스로 표시됨
-    // returns:이번 프레임에 진행할 방향. left, up, right, down 순서오 0, 1, 2, 3 으로 표현.
+    // returns:이번 프레임에 진행할 방향. left, up, right, down 순서오 0, 1, 2, 3 으로 표현. (-1 은 에러)
     // 메서드명은 반드시 아래 메서드와 일치해야합니다.
     moveNext(map, myPosition) {
         let min = 0;
