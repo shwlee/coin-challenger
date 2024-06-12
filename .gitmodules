@@ -1,0 +1,3 @@
+[submodule "playerHost"]
+	path = playerHost
+	url = https://github.com/shwlee/player
