@@ -51,6 +51,23 @@ public class GameManager : MonoBehaviour
         LoadSettings();
 
         runningTimeBeforeHurryUp = Settings.RunningTime > 0 ? Settings.RunningTime : 120;
+
+        ExitInputManager.OnExitPressed += ExitInputManager_OnExitPressed;
+        ExitInputManager.OnCleanExitPressed += ExitInputManager_OnCleanExitPressed;
+    }
+
+    private async void ExitInputManager_OnCleanExitPressed()
+    {
+        await ExitGame(true);
+        ExitInputManager.OnExitPressed += ExitInputManager_OnExitPressed;
+        ExitInputManager.OnCleanExitPressed += ExitInputManager_OnCleanExitPressed;
+    }
+
+    private async void ExitInputManager_OnExitPressed()
+    {
+        await ExitGame();
+        ExitInputManager.OnExitPressed += ExitInputManager_OnExitPressed;
+        ExitInputManager.OnCleanExitPressed += ExitInputManager_OnCleanExitPressed;
     }
 
     private void LoadSettings()
@@ -183,7 +200,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    async void Update()
+    void Update()
     {
         if (SceneManager.GetActiveScene().name != "Game")
         {
@@ -199,8 +216,6 @@ public class GameManager : MonoBehaviour
             SceneManager.LoadScene("Result");
             return;
         }
-
-        await Escape.ExitIfInputEscape();
     }
 
     private void CheckPlayTime()

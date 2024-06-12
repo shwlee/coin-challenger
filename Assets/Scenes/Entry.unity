@@ -639,6 +639,7 @@ GameObject:
   - component: {fileID: 1321589922}
   - component: {fileID: 1321589921}
   - component: {fileID: 1321589920}
+  - component: {fileID: 1321589924}
   m_Layer: 0
   m_Name: GameContext
   m_TagString: Untagged
@@ -731,6 +732,18 @@ MonoBehaviour:
   hurryUpBackground: {r: 1, g: 0, b: 0, a: 1}
   GameStatus: 0
   Mode: 0
+--- !u!114 &1321589924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1321589918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0ae803985f1cda48b6be452b2823cc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1494780750
 GameObject:
   m_ObjectHideFlags: 0

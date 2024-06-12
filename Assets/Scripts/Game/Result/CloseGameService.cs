@@ -29,6 +29,8 @@ public class CloseGameService : MonoBehaviour
         {
             player.PlayerObject?.gameObject.SetActive(false);
         }
+
+        SaveResult();
     }
 
     private void SetResult(GameObject position, IEnumerable<PlayerContext> allPlayers, int rank)
@@ -40,16 +42,16 @@ public class CloseGameService : MonoBehaviour
         _gameResult.Results.Add(new Result { Rank = rank, Name = context.Name, Score = context.Score });
     }
 
-    // Update is called once per frame
-    async void Update() 
-        => await Escape.ExitIfInputEscape(() => ExitGame());
+    //// Update is called once per frame
+    //async void Update() 
+    //    => await Escape.ExitIfInputEscape(() => ExitGame());
 
-    public async void ExitGame()
-    {
-        // 결과를 파일로 저장한 후 종료한다.
-        SaveResult();
-        await GameManager.Instance.ExitGame();
-    }
+    //public async void ExitGame()
+    //{
+    //    // 결과를 파일로 저장한 후 종료한다.
+    //    SaveResult();
+    //    await GameManager.Instance.ExitGame();
+    //}
 
     private void SaveResult()
     {
