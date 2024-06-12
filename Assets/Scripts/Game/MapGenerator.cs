@@ -88,6 +88,7 @@ public class MapGenerator : MonoBehaviour
 
         // 초기화 과정이 끝나면 GameInfoService 초기화
         GameInfoService.Instance.Init(column, row, _mapBag);
+        Debug.Log(JsonUtility.ToJson(GameInfoService.Instance.GetMapInfo()));
 
         _mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         Debug.Log($"current camera size:{_mainCamera.orthographicSize}");
