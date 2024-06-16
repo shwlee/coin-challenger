@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -19,7 +20,16 @@ public class PlayerController : MonoBehaviour
 
     private int PaneltyDelay => (int)(_moveTime * 1000);
 
-    public void SetPlayerModule(IPlayer module) => _player = module;
+    public async void SetPlayerModule(IPlayer module)
+    {
+        _player = module;
+
+        var name = await _player.GetName();
+        var nameObj = gameObject.transform.GetChild(0);
+        var nameMesh = nameObj.GetComponent<TextMeshPro>();
+        nameMesh.sortingOrder = 99;
+        nameMesh.text = name;
+    }
 
     // Start is called before the first frame update
     void Start()
