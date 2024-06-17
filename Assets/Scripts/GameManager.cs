@@ -59,15 +59,15 @@ public class GameManager : MonoBehaviour
     private async void ExitInputManager_OnCleanExitPressed()
     {
         await ExitGame(true);
-        ExitInputManager.OnExitPressed += ExitInputManager_OnExitPressed;
-        ExitInputManager.OnCleanExitPressed += ExitInputManager_OnCleanExitPressed;
+        ExitInputManager.OnExitPressed -= ExitInputManager_OnExitPressed;
+        ExitInputManager.OnCleanExitPressed -= ExitInputManager_OnCleanExitPressed;
     }
 
     private async void ExitInputManager_OnExitPressed()
     {
         await ExitGame();
-        ExitInputManager.OnExitPressed += ExitInputManager_OnExitPressed;
-        ExitInputManager.OnCleanExitPressed += ExitInputManager_OnCleanExitPressed;
+        ExitInputManager.OnExitPressed -= ExitInputManager_OnExitPressed;
+        ExitInputManager.OnCleanExitPressed -= ExitInputManager_OnCleanExitPressed;
     }
 
     private void LoadSettings()

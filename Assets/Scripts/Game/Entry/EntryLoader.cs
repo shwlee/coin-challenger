@@ -56,10 +56,6 @@ public class EntryLoader : MonoBehaviour
             {
                 mode = GameMode.Contest;
             }
-            //else if (await Escape.ExitIfInputEscape())
-            //{
-            //    return;
-            //}
             else
             {
                 _waitForGameModeSet = true;
@@ -89,11 +85,6 @@ public class EntryLoader : MonoBehaviour
                     return;
                 }
             }
-
-            //if (await Escape.ExitIfInputEscape())
-            //{
-            //    return;
-            //}
         }
     }
 

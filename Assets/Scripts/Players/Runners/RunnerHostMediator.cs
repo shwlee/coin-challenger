@@ -36,11 +36,11 @@ public partial class RunnerHostMediator
         }
     }
 
-    internal async static UniTask CloseRunner(int port, string platform)
+    internal async static UniTask<bool> CloseRunner(int port, string platform)
     {
         if (GameManager.Instance.Settings.CloseWithoutPlayerHostExit)
         {
-            return;
+            return true;
         }
 
         var rootPath = string.Format(HostRoot, port, platform);
@@ -49,10 +49,14 @@ public partial class RunnerHostMediator
         {
             using var request = UnityWebRequest.Post(url, (WWWForm)null);
             await request.SendWebRequest().WithCancellation(CancellationToken.None);
+
+            await UniTask.Delay(1000);
+            return false;
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
+            return false;
         }
     }
 
@@ -159,11 +163,16 @@ public partial class RunnerHostMediator
 
             _checked.Add(platform);
 
-            await CloseRunner(port, platform);
-            await UniTask.Delay(1000);
+            runnerHealthy = await CloseRunner(port, platform);
         }
 
         // runner execute
+
+        if (runnerHealthy)
+        {
+            return;
+        }
+
         var path = Path.Combine(Application.streamingAssetsPath, runnerPath);
         var runnerProcess = new Process();
         runnerProcess.StartInfo.FileName = path;
@@ -172,10 +181,10 @@ public partial class RunnerHostMediator
         runnerProcess.StartInfo.CreateNoWindow = true;
         runnerProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
-        runnerProcess.Start();
+        var process = runnerProcess.Start();
         _checked.Add(platform);
 
-        await UniTask.Delay(500);
+        await UniTask.Delay(5000);
     }
 
     internal async static UniTask CleanupPlayerHost(int port, string platform)
