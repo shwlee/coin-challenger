@@ -35,12 +35,12 @@ public class GameInfoService
     public (int column, int row) GetMapRange()
         => (_column, _row);
 
-    public void RemoveCoinByIndex(int index)
-        => RemoveCoin(index);
+    public void RemoveItem(int index)
+        => RemoveItemByIndex(index);    
 
-    private void RemoveCoin(int index)
+    private void RemoveItemByIndex(int index)
     {
-        Debug.Log($"GameInfoService.RemoveCoin index:{index}");
+        Debug.Log($"GameInfoService.RemoveItemByIndex. index:{index}");
 
         _mapBag[index] = 0;
 

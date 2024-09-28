@@ -256,27 +256,33 @@ public class GameManager : MonoBehaviour
         }
 
         var worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
         var hit = Physics2D.Raycast(worldPoint, Vector2.zero);
-        if (hit.collider == null)
+        if (hit.collider is not null) // coin
         {
+            var collision = hit.collider;
+            if (collision.CompareTag("Items"))
+            {
+                var coin = collision.gameObject;
+
+                // remove coin
+                Destroy(coin);
+                RemoveCoin(coin);
+            }
+
             return;
         }
 
-        var collision = hit.collider;
-        if (collision.CompareTag("Items"))
-        {
-            var coin = collision.gameObject;
+        // block
+        var index = CoordinateService.ToIndex(_mapGenerator.column, _mapGenerator.row, worldPoint);
 
-            // remove coin
-            Destroy(coin);
-            RemoveCoin(coin);
-        }
+        _mapGenerator.RemoveBlock(index);
     }
 
     private void RemoveCoin(GameObject coin)
     {
         var coinIndex = CoordinateService.ToIndex(_mapGenerator.column, _mapGenerator.row, coin.transform.position);
-        GameInfoService.Instance.RemoveCoinByIndex(coinIndex);
+        GameInfoService.Instance.RemoveItem(coinIndex);
     }
 
     private void GoHurryUp()
@@ -374,7 +380,7 @@ public class GameManager : MonoBehaviour
                 continue;
             }
 
-            GameInfoService.Instance.RemoveCoinByIndex(blackMatter);
+            GameInfoService.Instance.RemoveItem(blackMatter);
             yield return new WaitForSeconds(delayTime);
         }
     }
