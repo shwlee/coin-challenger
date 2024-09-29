@@ -412,7 +412,7 @@ public class GameManager : MonoBehaviour
         {
             if (GameStatus is GameStatus.GameSet)
             {
-                yield return null;
+                yield break;
             }
 
             // random 으로 block 파괴.
@@ -447,12 +447,12 @@ public class GameManager : MonoBehaviour
 
             if (GameStatus is not GameStatus.Playing)
             {
-                yield return null;
+                yield break;
             }
 
             if (GameInfoService.Instance.IsClearAllCoins()) // 방어처리
             {
-                yield return null;
+                yield break;
             }
 
             var playerPositions = _playerManager.GetAllPlayersPositions();
@@ -464,6 +464,11 @@ public class GameManager : MonoBehaviour
 
             foreach (var tilePosition in emptyTiles)
             {
+                if (GameStatus is GameStatus.GameSet) // 방어 처리.
+                {
+                    yield break;
+                }
+
                 _mapGenerator.AddBlackMatter(tilePosition);
             }
         }
