@@ -13,5 +13,4 @@ public class GameSettings
 
     public bool CloseWithoutPlayerHostExit;
     public bool UseRandomGimmick = true;
-    public float GimmickInterval = 3f;
 }

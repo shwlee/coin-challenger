@@ -33,7 +33,7 @@ public static class CoordinateService
         return height * column + width;
     }
 
-    public static (float x, float y) ToUnity2dCoordiate(int column, int row, int index, float anchor = 0.5f)
+    public static (float x, float y) ToUnity2dCoordinate(int column, int row, int index, float anchor = 0.5f)
     {
         var cMin = -(column / 2);
         var rMax = (row / 2) - 1;

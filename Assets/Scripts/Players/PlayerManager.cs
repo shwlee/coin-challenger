@@ -33,6 +33,20 @@ public class PlayerManager : MonoBehaviour
         return _players.Values.ToList();
     }
 
+    public int[] GetAllPlayersPositions()
+    {
+        var positions = new List<int>();
+        foreach (var playerSet in _players)
+        {
+            var playerContext = playerSet.Value;
+            var controller = playerContext.PlayerObject.GetComponent<PlayerController>();
+            var position = controller.GetPlayerPositionIndex();
+            positions.Add(position);
+        }
+
+        return positions.ToArray();
+    }
+
     private async void LoadTestDummy()
     {
         var dummyPlayer = new DummyPlayer();

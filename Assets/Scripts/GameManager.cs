@@ -22,6 +22,9 @@ public class GameManager : MonoBehaviour
     public GameStatus GameStatus;
     public GameMode Mode;
 
+    public float startRandomCoin = 15f;
+    public float destroyBlockInterval = 3f;
+
     public GameSettings Settings { get; set; }
 
     private MapGenerator _mapGenerator;
@@ -248,38 +251,44 @@ public class GameManager : MonoBehaviour
 
     private void CheckMouseClickToRemoveItem()
     {
-        if (Mode == GameMode.Contest) // 마우스 coin 제거는 contest 모드에서는 사용 불가.
+        if (Mode == GameMode.Contest) // 클릭 테스트는 contest 모드에서는 사용 불가.
         {
             return;
         }
 
-        if (Input.GetMouseButtonDown(0) is false)
+        if (Input.GetMouseButtonDown(0)) // 좌클릭은 코인이나 블럭 제거.
         {
-            return;
-        }
+            var worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        var worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-        var hit = Physics2D.Raycast(worldPoint, Vector2.zero);
-        if (hit.collider is not null) // coin
-        {
-            var collision = hit.collider;
-            if (collision.CompareTag("Items"))
+            var hit = Physics2D.Raycast(worldPoint, Vector2.zero);
+            if (hit.collider is not null) // coin
             {
-                var coin = collision.gameObject;
+                var collision = hit.collider;
+                if (collision.CompareTag("Items"))
+                {
+                    var coin = collision.gameObject;
 
-                // remove coin
-                Destroy(coin);
-                RemoveCoin(coin);
+                    // remove coin
+                    Destroy(coin);
+                    RemoveCoin(coin);
+                }
+
+                return;
             }
 
-            return;
+            // block
+            var index = CoordinateService.ToIndex(_mapGenerator.column, _mapGenerator.row, worldPoint);
+
+            _mapGenerator.RemoveBlock(index);
         }
 
-        // block
-        var index = CoordinateService.ToIndex(_mapGenerator.column, _mapGenerator.row, worldPoint);
+        if (Input.GetMouseButtonDown(1)) // 우클릭은 blackMatter 생성.
+        {
+            var worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            var index = CoordinateService.ToIndex(_mapGenerator.column, _mapGenerator.row, worldPoint);
 
-        _mapGenerator.RemoveBlock(index);
+            _mapGenerator.AddBlackMatter(index);
+        }
     }
 
     private void RemoveCoin(GameObject coin)
@@ -387,12 +396,17 @@ public class GameManager : MonoBehaviour
         _isGimmickRunning = true;
 
         // gimmick 수행.
-        StartCoroutine(RunGimmick());
+        StartCoroutine(RunDestroyBlocksGimmick());
+        StartCoroutine(GenerateRandomBlackMatter());
     }
 
-    private IEnumerator RunGimmick()
+    /// <summary>
+    /// 지정된 시간 간격으로 랜덤하게 block 을 파괴한다.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator RunDestroyBlocksGimmick()
     {
-        yield return new WaitForSeconds(Settings.GimmickInterval);
+        yield return new WaitForSeconds(destroyBlockInterval);
 
         while (GameInfoService.Instance.IsClearAllCoins() is false)
         {
@@ -401,29 +415,60 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
 
-            yield return StartCoroutine(DestroyBlocks());
+            // random 으로 block 파괴.
+            var removeBlock = GameInfoService.Instance.GetRandomBlockIndex();
+            if (removeBlock is -1) // 선택 가능한 block 이 없음.
+            {
+                yield break;
+            }
+
+            if (GameStatus is GameStatus.GameSet)
+            {
+                yield break;
+            }
+
+            _mapGenerator.RemoveBlock(removeBlock);
+
+            yield return new WaitForSeconds(destroyBlockInterval);
         }
 
         yield return null;
     }
 
-    private IEnumerator DestroyBlocks()
+    /// <summary>
+    /// 지정된 시간 간격이 되면 blackMatter 4개를 빈 자리에 생성한다.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator GenerateRandomBlackMatter()
     {
-        // random 으로 block 파괴.
-        var removeBlock = GameInfoService.Instance.GetRandomBlockIndex();
-        if (removeBlock is -1) // 선택 가능한 block 이 없음.
+        while (GameStatus is GameStatus.Playing)
         {
-            yield break;
+            yield return new WaitForSeconds(startRandomCoin);
+
+            if (GameStatus is not GameStatus.Playing)
+            {
+                yield return null;
+            }
+
+            if (GameInfoService.Instance.IsClearAllCoins()) // 방어처리
+            {
+                yield return null;
+            }
+
+            var playerPositions = _playerManager.GetAllPlayersPositions();
+            var emptyTiles = GameInfoService.Instance.GetRandomEmptyTiles(4, playerPositions); // 4 개만 생성한다.
+            if (emptyTiles.Length is 0)
+            {
+                continue;
+            }
+
+            foreach (var tilePosition in emptyTiles)
+            {
+                _mapGenerator.AddBlackMatter(tilePosition);
+            }
         }
 
-        if (GameStatus is GameStatus.GameSet)
-        {
-            yield break;
-        }
-
-        _mapGenerator.RemoveBlock(removeBlock);
-
-        yield return new WaitForSeconds(Settings.GimmickInterval);
+        yield return null;
     }
 
     private IEnumerator RemoveCoins(CoinType coinType, float delayTime)

@@ -77,10 +77,7 @@ public class PlayerController : MonoBehaviour
         _isMoving = true;
 
         var (column, row, map) = GameInfoService.Instance.GetMapInfo();
-        var x = RoundToHalf(transform.position.x);
-        var y = RoundToHalf(transform.position.y);
-        var current = CoordinateService.ToIndex(column, row, x, y);
-
+        var current = GetCurrentPosition(column, row);
         var direction = IsTestMode() is false ? await CalcToWhere(map, current) : GetDirectionByInput();
 
         if (direction is null)
@@ -108,6 +105,26 @@ public class PlayerController : MonoBehaviour
         {
             StartCoroutine(MoveSmoothGrid(moveTo));
         }
+    }
+
+    public int GetPlayerPositionIndex()
+        => GetCurrentPosition();
+
+    private int GetCurrentPosition()
+    {
+        var (column, row) = GameInfoService.Instance.GetMapRange();
+        var x = RoundToHalf(transform.position.x);
+        var y = RoundToHalf(transform.position.y);
+        var current = CoordinateService.ToIndex(column, row, x, y);
+        return current;
+    }
+
+    private int GetCurrentPosition(int column, int row)
+    {
+        var x = RoundToHalf(transform.position.x);
+        var y = RoundToHalf(transform.position.y);
+        var current = CoordinateService.ToIndex(column, row, x, y);
+        return current;
     }
 
     private bool IsTestMode()

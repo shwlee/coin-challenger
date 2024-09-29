@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
-using static Unity.Collections.AllocatorManager;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -21,10 +20,14 @@ public class MapGenerator : MonoBehaviour
     public int column;
     public int row;
 
-    public GameObject _explosionPrefab;
+    public GameObject explosionPrefab;
 
-    private GameObject _loadedMap;
-    private float _explosionDuration = 1f;   // 폭발 애니메이션 지속 시간 기본 1초
+    public GameObject blackMatterPrefab;
+
+    /// <summary>
+    /// 폭발 애니메이션 완료 시간을 기다리는 시간. 기본 1초
+    /// </summary>
+    private float _explosionDuration = 1f;
 
     /// <summary>
     /// left top position
@@ -45,6 +48,11 @@ public class MapGenerator : MonoBehaviour
     /// right bottom position
     /// </summary>
     public Vector2 p4Position;
+
+    /// <summary>
+    /// prefab 으로 부터 로딩된 map 인스턴스.
+    /// </summary>
+    private GameObject _loadedMap;
 
     private Tilemap _blocks;
 
@@ -181,7 +189,7 @@ public class MapGenerator : MonoBehaviour
 
         // 블럭 파괴 애니메이션을 수행할 프리팹 생성.
         var animPosition = new Vector3(tileWorldPosition.x + 0.5f, tileWorldPosition.y + 0.5f, 0);
-        var explosion = Instantiate(_explosionPrefab, animPosition, Quaternion.identity);
+        var explosion = Instantiate(explosionPrefab, animPosition, Quaternion.identity);
         explosion.transform.localScale = new Vector3(_blocks.cellSize.x, _blocks.cellSize.y, 1);
 
         // 내부 타일 제거.
@@ -193,6 +201,19 @@ public class MapGenerator : MonoBehaviour
 
         // 일정 시간(애니메이션 수행) 후 타일을 삭제
         StartCoroutine(RemoveTileAfterAnimation(position, blockIndex, explosion));
+    }
+
+    public void AddBlackMatter(int locationIndex)
+    {
+        var coordinate = CoordinateService.ToUnity2dCoordinate(column, row, locationIndex);
+        var position = new Vector3(coordinate.x, coordinate.y, 0);
+        var blackMatter = Instantiate(blackMatterPrefab, position, Quaternion.identity);
+        var blackMatterContext = blackMatter.GetComponent<CoinBlackMatterContext>();
+        blackMatterContext.InitializeInRuntime();
+
+        _mapBag[locationIndex] = 500;
+
+        GameInfoService.Instance.AddBlackMatter(locationIndex);
     }
 
     private IEnumerator RemoveTileAfterAnimation(Vector3Int tilePosition, int blockIndex, GameObject explosion)
