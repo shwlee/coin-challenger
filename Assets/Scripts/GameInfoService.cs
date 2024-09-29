@@ -174,7 +174,7 @@ public class GameInfoService
         SetLeftIndexesForEmpty(index, totalBag, columnMin, distance);
 
         // 우
-        SetRightIndexesForEmpty(index, totalBag, columnMax, distance);
+        SetRightIndexesForEmpty(index, totalBag, columnMax, totalLength, distance);
     }
 
     private void SetUpIndexesForEmpty(int index, HashSet<int> totalBag, int distance = 1)
@@ -216,7 +216,7 @@ public class GameInfoService
         for (int i = 0; i < distance; i++)
         {
             var left = index - (i + 1);
-            if (left < columnMin)
+            if (left < columnMin || left < 0)
             {
                 continue;
             }
@@ -228,12 +228,12 @@ public class GameInfoService
         }
     }
 
-    private void SetRightIndexesForEmpty(int index, HashSet<int> totalBag, int columnMax, int distance = 1)
-    {
+    private void SetRightIndexesForEmpty(int index, HashSet<int> totalBag, int columnMax, int totalLength, int distance = 1)
+    {        
         for (int i = 0; i < distance; i++)
         {
             var right = index + (i + 1);
-            if (right > columnMax)
+            if (right > columnMax || right >= totalLength)
             {
                 continue;
             }
