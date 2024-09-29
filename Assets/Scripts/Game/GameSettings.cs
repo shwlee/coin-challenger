@@ -12,4 +12,6 @@ public class GameSettings
     public string JsHostPath;
 
     public bool CloseWithoutPlayerHostExit;
+    public bool UseRandomGimmick = true;
+    public float GimmickInterval = 3f;
 }

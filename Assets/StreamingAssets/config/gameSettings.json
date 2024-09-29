@@ -4,5 +4,7 @@
     "CsharpHostport": 50109,
     "JsHostPath": "Runners/JsHost/jsHost.exe",
     "JsHostport": 50209,
-    "CloseWithoutPlayerHostExit" : true
+    "CloseWithoutPlayerHostExit" : true,
+    "UseRandomGimmick" : true,
+    "GimmickInterval": 3.0
 }

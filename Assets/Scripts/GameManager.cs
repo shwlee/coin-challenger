@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public float runningTimeBeforeHurryUp = 120f; // 기본 120초(2분)이 게임시간. 2분이 경과되면 hurryUp mode.
-    public float hurryUpBlinkingDuration = 0.5F;
+    public float hurryUpBlinkingDuration = 0.5f;
     public Color hurryUpBackground = Color.red;
 
     public GameStatus GameStatus;
@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
 
     private bool _isHurryUpProcedureStarted;
     private bool _isClosing;
+    private bool _isGimmickRunning;
 
     void Awake()
     {
@@ -207,9 +208,11 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        StartRandomGimmick();
+
         CheckPlayTime();
 
-        CheckMouseClickForCoinRemove();
+        CheckMouseClickToRemoveItem();
 
         if (Input.GetKey(KeyCode.Return))
         {
@@ -243,7 +246,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void CheckMouseClickForCoinRemove()
+    private void CheckMouseClickToRemoveItem()
     {
         if (Mode == GameMode.Contest) // 마우스 coin 제거는 contest 모드에서는 사용 불가.
         {
@@ -364,6 +367,65 @@ public class GameManager : MonoBehaviour
         yield return null;
     }
 
+    private void StartRandomGimmick()
+    {
+        if (GameStatus is not GameStatus.Playing)
+        {
+            return;
+        }
+
+        if (_isGimmickRunning)
+        {
+            return;
+        }
+
+        if (Settings.UseRandomGimmick is false)
+        {
+            return;
+        }
+
+        _isGimmickRunning = true;
+
+        // gimmick 수행.
+        StartCoroutine(RunGimmick());
+    }
+
+    private IEnumerator RunGimmick()
+    {
+        yield return new WaitForSeconds(Settings.GimmickInterval);
+
+        while (GameInfoService.Instance.IsClearAllCoins() is false)
+        {
+            if (GameStatus is GameStatus.GameSet)
+            {
+                yield return null;
+            }
+
+            yield return StartCoroutine(DestroyBlocks());
+        }
+
+        yield return null;
+    }
+
+    private IEnumerator DestroyBlocks()
+    {
+        // random 으로 block 파괴.
+        var removeBlock = GameInfoService.Instance.GetRandomBlockIndex();
+        if (removeBlock is -1) // 선택 가능한 block 이 없음.
+        {
+            yield break;
+        }
+
+        if (GameStatus is GameStatus.GameSet)
+        {
+            yield break;
+        }
+
+        _mapGenerator.RemoveBlock(removeBlock);
+
+        yield return new WaitForSeconds(Settings.GimmickInterval);
+    }
+
     private IEnumerator RemoveCoins(CoinType coinType, float delayTime)
     {
         var randomCoins = GameInfoService.Instance.GetRandomCoinIndexes(coinType);
@@ -372,15 +434,15 @@ public class GameManager : MonoBehaviour
             yield break;
         }
 
-        foreach (var blackMatter in randomCoins)
+        foreach (var coin in randomCoins)
         {
-            var removeResult = _mapGenerator.RemoveCoin(blackMatter);
+            var removeResult = _mapGenerator.RemoveCoin(coin);
             if (removeResult is CoinActionResult.NotExists) // 이미 지워졌으면 다음 코인 삭제 시도.
             {
                 continue;
             }
 
-            GameInfoService.Instance.RemoveItem(blackMatter);
+            GameInfoService.Instance.RemoveItem(coin);
             yield return new WaitForSeconds(delayTime);
         }
     }

@@ -36,7 +36,7 @@ public class GameInfoService
         => (_column, _row);
 
     public void RemoveItem(int index)
-        => RemoveItemByIndex(index);    
+        => RemoveItemByIndex(index);
 
     private void RemoveItemByIndex(int index)
     {
@@ -97,6 +97,28 @@ public class GameInfoService
         }
 
         return coinIndexes.OrderBy(x => _random.Next());
+    }
+
+    public int GetRandomBlockIndex()
+    {
+        var blockIndexes = new List<int>();
+        for (var i = 0; i < _mapBag.Length; i++)
+        {
+            if (_mapBag[i] is -1)
+            {
+                blockIndexes.Add(i);
+            }
+        }
+
+        if (blockIndexes.Count is 0)
+        {
+            return -1;
+        }
+
+        var blockIndex = blockIndexes.OrderBy(x => _random.Next()).Take(1).FirstOrDefault();
+        Debug.Log($"select block index to remove. block:{blockIndex}");
+
+        return blockIndex;
     }
 
     public bool IsClearAllCoins()
