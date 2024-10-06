@@ -3,6 +3,15 @@ using Cysharp.Threading.Tasks;
 public interface IPlayer
 {
     /// <summary>
+    /// player host 에 현재 게임 정보 셋업 요청을 보냅니다.
+    /// </summary>
+    /// <param name="gameId"></param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <returns></returns>
+    UniTask GameSetup(string gameId, int column, int row);
+
+    /// <summary>
     /// 기준 파일의 경로를 설정합니다. 경로에 위치한 파일을 읽어서 인스턴스를 설정합니다.
     /// </summary>
     /// <param name="path"></param>
@@ -31,5 +40,5 @@ public interface IPlayer
     /// <param name="map">1차원 배열로 표현된 현재 map 정보.</param>
     /// <param name="currentPosition">현재 플레이어의 위치. map 배열의 인덱스로 표시됨.</param>    
     /// <returns>이번 프레임에 진행할 방향. left, up, right, down 순서오 0, 1, 2, 3 으로 표현.</returns>
-    UniTask<int?> MoveNext(int[] map, int currentPosition);
+    UniTask<int?> MoveNext(int turn, int[] map, int currentPosition);
 }

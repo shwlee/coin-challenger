@@ -19,7 +19,12 @@ public class GameManager : MonoBehaviour
     public float hurryUpBlinkingDuration = 0.5f;
     public Color hurryUpBackground = Color.red;
 
-    public GameStatus GameStatus;
+    private GameStatus _gameStatus;
+
+    public GameStatus GameStatus {
+        get => _gameStatus;
+        set => _gameStatus = value;
+    }
     public GameMode Mode;
 
     public float startRandomCoin = 15f;
@@ -29,6 +34,8 @@ public class GameManager : MonoBehaviour
 
     private MapGenerator _mapGenerator;
     private PlayerManager _playerManager;
+
+    private string _gameId;
 
     private bool _isHurryUpProcedureStarted;
     private bool _isClosing;
@@ -92,6 +99,8 @@ public class GameManager : MonoBehaviour
         var json = File.ReadAllText(path);
         var settings = JsonUtility.FromJson<GameSettings>(json);
         Settings = settings;
+
+        _gameId = DateTime.Now.ToString("yyyyMMdd-HHmmss");
     }
 
     private void SaveDefaultGameSettings(string settingFilePath, GameSettings settings)
@@ -154,7 +163,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        await _playerManager.InitPlayer(column, row, playerPositions);
+        await _playerManager.InitPlayer(_gameId, column, row, playerPositions);
     }
 
     public IEnumerable<PlayerContext> GetAllPlayerContexts()

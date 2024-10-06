@@ -36,6 +36,22 @@ public partial class RunnerHostMediator
         }
     }
 
+    internal async static UniTask SetCurrentGame(int port, string platform, string gameId, int column, int row)
+    {
+        var rootPath = string.Format(HostRoot, port, platform);
+        var url = $"{rootPath}/{PartGame}/{Set}?gameId={gameId}&column={column}&row={row}";
+        try
+        {
+            using var request = UnityWebRequest.Post(url, (WWWForm)null);
+            await request.SendWebRequest().WithCancellation(CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            throw;
+        }
+    }
+
     internal async static UniTask<bool> CloseRunner(int port, string platform)
     {
         if (GameManager.Instance.Settings.CloseWithoutPlayerHostExit)
@@ -128,9 +144,9 @@ public partial class RunnerHostMediator
         }
     }
 
-    internal async static UniTask<int?> GetMoveNextDirection(int port, string platform, int myNumber, int[] map, int currentPosition)
+    internal async static UniTask<int?> GetMoveNextDirection(int port, string platform, int myNumber, int turn, int[] map, int currentPosition)
     {
-        var message = new GameMessage { position = myNumber, map = map, current = currentPosition };
+        var message = new GameMessage { turn = turn, position = myNumber, map = map, current = currentPosition };
         var rootPath = string.Format(HostRoot, port, platform);
         var url = $"{rootPath}/{PartPlayer}/{Movenext}";
         try
@@ -180,6 +196,7 @@ public partial class RunnerHostMediator
         runnerProcess.StartInfo.UseShellExecute = false;
         runnerProcess.StartInfo.CreateNoWindow = true;
         runnerProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        runnerProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(path);
 
         var process = runnerProcess.Start();
         _checked.Add(platform);
