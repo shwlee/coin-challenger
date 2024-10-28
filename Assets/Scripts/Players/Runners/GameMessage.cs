@@ -1,5 +1,6 @@
 public class GameMessage
 {
+    public int turn;
     public int position;
     public int[] map;
     public int current;

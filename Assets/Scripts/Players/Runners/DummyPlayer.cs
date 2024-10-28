@@ -7,6 +7,9 @@ public class DummyPlayer : IPlayer
     private System.Random _random = new System.Random();
     private int _myNumber;
 
+    public UniTask GameSetup(string gameId, int column, int row)
+        => UniTask.CompletedTask;
+
     public UniTask Setup(int myPostion, string path)
     {
         _myNumber = myPostion;
@@ -25,9 +28,9 @@ public class DummyPlayer : IPlayer
     public UniTask LoadRunner()
         => throw new NotImplementedException();
 
-    public UniTask<int?> MoveNext(int[] map, int currentPosition)
+    public UniTask<int?> MoveNext(int turn, int[] map, int currentPosition)
         => UniTask.FromResult<int?>(_random.Next(0, 3));
 
     public UniTask CloseHost()
-        => UniTask.CompletedTask;
+        => UniTask.CompletedTask;    
 }

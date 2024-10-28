@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
 
     private int PaneltyDelay => (int)(_moveTime * 1000);
 
+    private int _turn;
+
     public async void SetPlayerModule(IPlayer module)
     {
         _player = module;
@@ -76,9 +78,11 @@ public class PlayerController : MonoBehaviour
 
         _isMoving = true;
 
+        _turn++;
+
         var (column, row, map) = GameInfoService.Instance.GetMapInfo();
         var current = GetCurrentPosition(column, row);
-        var direction = IsTestMode() is false ? await CalcToWhere(map, current) : GetDirectionByInput();
+        var direction = IsTestMode() is false ? await CalcToWhere(_turn, map, current) : GetDirectionByInput();
 
         if (direction is null)
         {
@@ -139,10 +143,10 @@ public class PlayerController : MonoBehaviour
     /// <param name="map"></param>
     /// <param name="current"></param>
     /// <returns></returns>
-    private async UniTask<MoveDirection?> CalcToWhere(int[] map, int current)
+    private async UniTask<MoveDirection?> CalcToWhere(int turn, int[] map, int current)
     {
         // 요기서 사용자 알고리즘 함수 호출.
-        var result = await _player.MoveNext(map, current);
+        var result = await _player.MoveNext(turn, map, current);
         if (result is null || result == -1)  // null or -1 이면 비정상 결과.
         {
             // 1초 페널티.

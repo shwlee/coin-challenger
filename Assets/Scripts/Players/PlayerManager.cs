@@ -132,11 +132,11 @@ public class PlayerManager : MonoBehaviour
         _players.Add(index, playerContext);
     }
 
-    public async UniTask InitPlayer(int column, int row, Dictionary<int, Vector2> players)
+    public async UniTask InitPlayer(string gameId, int column, int row, Dictionary<int, Vector2> players)
     {
         foreach (var position in players)
         {
-            await SetPlayer(position.Key, position.Value, column, row);
+            await SetPlayer(position.Key, position.Value, gameId, column, row);
         }
     }
 
@@ -173,9 +173,11 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private async UniTask SetPlayer(int index, Vector3 location, int column, int row)
+    private async UniTask SetPlayer(int index, Vector3 location, string gameId, int column, int row)
     {
         var playerContext = _players[index];
+        await playerContext.Player.GameSetup(gameId, column, row);
+
         var prefab = PlayerObjects[index];
         var player = Instantiate(prefab); // TODO : player prefab 을 바꾸는 걸로 전환.
         DontDestroyOnLoad(player);
