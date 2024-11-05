@@ -8,13 +8,11 @@ public static class Consts
     public const string CsFile = ".cs";
     public const string JsFile = ".js";
     public const string PyFile = ".py";
-    public const string CppFile = ".cpp";
     public static readonly string[] PlatformFiles = new string[]
     {
         CsFile,
         JsFile,
-        PyFile,
-        CppFile
+        PyFile
     };
 
     public const string Csharp = "csharp";
