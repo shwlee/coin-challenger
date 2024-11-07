@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     private const string ConfigPath = "config";
-    private const string ConfigFile = "gameSettings.json";
+    private const string ConfigFile = "gameSettings.{0}.json";
 
     public static GameManager Instance { get; private set; }
 
@@ -80,10 +80,19 @@ public class GameManager : MonoBehaviour
         ExitInputManager.OnExitPressed -= ExitInputManager_OnExitPressed;
         ExitInputManager.OnCleanExitPressed -= ExitInputManager_OnCleanExitPressed;
     }
+    
+    private string GetConfigFileWithPlatform()
+    {
+        string platform = Application.platform == RuntimePlatform.OSXPlayer 
+            || Application.platform == RuntimePlatform.OSXEditor
+            ? "mac"
+            : "windows";
+        return string.Format(ConfigFile, platform);
+    }
 
     private void LoadSettings()
     {
-        var path = Path.Combine(Application.streamingAssetsPath, ConfigPath, ConfigFile);
+        var path = Path.Combine(Application.streamingAssetsPath, ConfigPath, GetConfigFileWithPlatform());
         var folder = Path.GetDirectoryName(path);
         if (Directory.Exists(folder) is false)
         {
