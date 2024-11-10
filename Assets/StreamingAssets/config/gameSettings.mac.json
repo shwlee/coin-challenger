@@ -1,0 +1,9 @@
+{
+    "RunningTime" : 120,
+    "CsharpHostPath": "Runners/Mac/CSharpHost/CSharpHost",
+    "CsharpHostport": 50109,
+    "JsHostPath": "Runners/Mac/JsHost/jsHost",
+    "JsHostport": 50209,
+    "CloseWithoutPlayerHostExit" : true,
+    "UseRandomGimmick" : true
+}

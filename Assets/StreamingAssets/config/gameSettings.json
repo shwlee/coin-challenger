@@ -1,9 +1,0 @@
-{
-    "RunningTime" : 120,
-    "CsharpHostPath": "Runners/CSharpHost/CSharpHost.exe",
-    "CsharpHostport": 50109,
-    "JsHostPath": "Runners/JsHost/jsHost.exe",
-    "JsHostport": 50209,
-    "CloseWithoutPlayerHostExit" : true,
-    "UseRandomGimmick" : true
-}
