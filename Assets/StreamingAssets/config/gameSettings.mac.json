@@ -4,6 +4,10 @@
     "CsharpHostport": 50109,
     "JsHostPath": "Runners/Mac/JsHost/jsHost",
     "JsHostport": 50209,
+    "CppHostPath": "Runners/Mac/JsHost/CppHost",
+    "CppHostport": 50309,
+    "PyHostPath": "Runners/Windows/JsHost/PyHost",
+    "PyHostport": 50409,
     "CloseWithoutPlayerHostExit" : true,
     "UseRandomGimmick" : true
 }

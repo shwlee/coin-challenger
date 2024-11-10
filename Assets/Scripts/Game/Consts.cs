@@ -20,7 +20,7 @@ public static class Consts
     public const string Csharp = "csharp";
     public const string Js = "js";
     public const string Cpp = "cpp";
-    public const string python = "py";
+    public const string Python = "py";
 }
 
 public enum GameStatus

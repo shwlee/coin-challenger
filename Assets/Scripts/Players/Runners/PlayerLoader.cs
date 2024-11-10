@@ -31,9 +31,11 @@ public static class PlayerLoader
     private static UniTask<IPlayer> LoadJsRunner(int position, string path)
         => GeneratePlayer<JsPlayerRunner>(position, path);
 
-    // TODO : python 추가 전까지 봉인.
-    //private static UniTask<IPlayer> LoadPyRunner(int position, string path)
-    //    => GeneratePlayer<PyPlayerRunner>(position, path);
+    private static UniTask<IPlayer> LoadCppsRunner(int position, string path)
+        => GeneratePlayer<CppPlayerRunner>(position, path);
+
+    private static UniTask<IPlayer> LoadPyRunner(int position, string path)
+        => GeneratePlayer<PyPlayerRunner>(position, path);
 
     private async static UniTask<IPlayer> GeneratePlayer<T>(int position, string path) where T : IPlayer, new()
     {
