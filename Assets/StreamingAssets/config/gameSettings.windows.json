@@ -4,10 +4,10 @@
     "CsharpHostport": 50109,
     "JsHostPath": "Runners/Windows/JsHost/jsHost.exe",
     "JsHostport": 50209,
-    "CppHostPath": "Runners/Windows/JsHost/CppHost.exe",
+    "CppHostPath": "Runners/Windows/CppHost/CppHost.exe",
     "CppHostport": 50309,
-    "PyHostPath": "Runners/Windows/JsHost/PyHost.exe",
-    "PyHostport": 50409,
+    "PyHostPath": "Runners/Windows/PyHost/PyHost.exe",
+    "PyHostport": 8000,
     "CloseWithoutPlayerHostExit" : true,
     "UseRandomGimmick" : true
 }

@@ -9,8 +9,8 @@ public static class PlayerLoader
     {
         { ".cs", (position, path) => LoadCSharpRunner(position, path) },
         { ".js", (position,path) => LoadJsRunner(position, path) },
-        { ".cpp", (position,path) => LoadJsRunner(position, path) },
-        //{ ".py", (position,path) => LoadPyRunner(position, path) }, // TODO : python 추가 전까지 봉인.
+        { ".cpp", (position,path) => LoadCppsRunner(position, path) },
+        { ".py", (position,path) => LoadPyRunner(position, path) }.
     };
 
     public async static UniTask<IPlayer> Load(int position, string path)
