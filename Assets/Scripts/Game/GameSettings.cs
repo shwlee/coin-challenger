@@ -11,6 +11,12 @@ public class GameSettings
     public int JsHostport;
     public string JsHostPath;
 
+    public int CppHostport;
+    public string CppHostPath;
+
+    public int PyHostport;
+    public string PyHostPath;
+
     public bool CloseWithoutPlayerHostExit;
     public bool UseRandomGimmick = true;
 }
