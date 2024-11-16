@@ -7,7 +7,7 @@
     "CppHostPath": "Runners/Windows/CppHost/CppHost.exe",
     "CppHostport": 50309,
     "PyHostPath": "Runners/Windows/PyHost/PyHost.exe",
-    "PyHostport": 8000,
+    "PyHostport": 50409,
     "CloseWithoutPlayerHostExit" : true,
     "UseRandomGimmick" : true
 }

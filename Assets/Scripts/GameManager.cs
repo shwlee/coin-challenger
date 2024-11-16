@@ -21,7 +21,8 @@ public class GameManager : MonoBehaviour
 
     private GameStatus _gameStatus;
 
-    public GameStatus GameStatus {
+    public GameStatus GameStatus
+    {
         get => _gameStatus;
         set => _gameStatus = value;
     }
@@ -80,10 +81,10 @@ public class GameManager : MonoBehaviour
         ExitInputManager.OnExitPressed -= ExitInputManager_OnExitPressed;
         ExitInputManager.OnCleanExitPressed -= ExitInputManager_OnCleanExitPressed;
     }
-    
+
     private string GetConfigFileWithPlatform()
     {
-        string platform = Application.platform == RuntimePlatform.OSXPlayer 
+        string platform = Application.platform == RuntimePlatform.OSXPlayer
             || Application.platform == RuntimePlatform.OSXEditor
             ? "mac"
             : "windows";
@@ -214,6 +215,14 @@ public class GameManager : MonoBehaviour
                     await JsPlayerRunner.CleanupHost();
                     await JsPlayerRunner.CloseHost();
                     break;
+                case Type _ when platform == typeof(CppPlayerRunner):
+                    await CppPlayerRunner.CleanupHost();
+                    await CppPlayerRunner.CloseHost();
+                    break;
+                case Type _ when platform == typeof(PyPlayerRunner):
+                    await PyPlayerRunner.CleanupHost();
+                    await PyPlayerRunner.CloseHost();
+                    break;
                 case Type _ when platform == typeof(DummyPlayer):
                     break;
                 default:
@@ -237,6 +246,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Return))
         {
+            GameStatus = GameStatus.GameSet;
             SceneManager.LoadScene("Result");
             return;
         }
