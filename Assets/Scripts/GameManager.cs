@@ -21,7 +21,8 @@ public class GameManager : MonoBehaviour
 
     private GameStatus _gameStatus;
 
-    public GameStatus GameStatus {
+    public GameStatus GameStatus
+    {
         get => _gameStatus;
         set => _gameStatus = value;
     }
@@ -80,10 +81,10 @@ public class GameManager : MonoBehaviour
         ExitInputManager.OnExitPressed -= ExitInputManager_OnExitPressed;
         ExitInputManager.OnCleanExitPressed -= ExitInputManager_OnCleanExitPressed;
     }
-    
+
     private string GetConfigFileWithPlatform()
     {
-        string platform = Application.platform == RuntimePlatform.OSXPlayer 
+        string platform = Application.platform == RuntimePlatform.OSXPlayer
             || Application.platform == RuntimePlatform.OSXEditor
             ? "mac"
             : "windows";
@@ -194,7 +195,7 @@ public class GameManager : MonoBehaviour
     {
         var playerContexts = _playerManager.GetPlayerContexts();
         // 종료 전 cleanup 호출.
-        var playerForms = playerContexts.Select(player => player.Player).ToList();
+        var playerForms = playerContexts.Where(player => player.Player is not null).Select(player => player.Player).ToList();
         var playerGroups = playerForms.GroupBy(form => form.GetType());
         if (isForcePlayerHostShutdown)
         {
@@ -213,6 +214,14 @@ public class GameManager : MonoBehaviour
                 case Type _ when platform == typeof(JsPlayerRunner):
                     await JsPlayerRunner.CleanupHost();
                     await JsPlayerRunner.CloseHost();
+                    break;
+                case Type _ when platform == typeof(CppPlayerRunner):
+                    await CppPlayerRunner.CleanupHost();
+                    await CppPlayerRunner.CloseHost();
+                    break;
+                case Type _ when platform == typeof(PyPlayerRunner):
+                    await PyPlayerRunner.CleanupHost();
+                    await PyPlayerRunner.CloseHost();
                     break;
                 case Type _ when platform == typeof(DummyPlayer):
                     break;
@@ -237,6 +246,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Return))
         {
+            GameStatus = GameStatus.GameSet;
             SceneManager.LoadScene("Result");
             return;
         }

@@ -1,4 +1,5 @@
 using Assets.Scripts.Game;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -170,6 +171,11 @@ public class MapGenerator : MonoBehaviour
 
     public void RemoveBlock(int blockIndex)
     {
+        if (CanRemoveBlock() is false)
+        {
+            return;
+        }
+
         var blockContext = _blockPositions.FirstOrDefault(context => context.Index == blockIndex);
         if (blockContext is null)
         {
@@ -179,28 +185,42 @@ public class MapGenerator : MonoBehaviour
         _blockPositions.Remove(blockContext);
 
         var position = blockContext.Position;
-        if (_blocks.HasTile(position) is false)
+
+        // control 객체 접근 전 더블 췍
+        if (CanRemoveBlock() is false)
         {
             return;
         }
 
-        // 내부 타일 월드 좌표를 가져와 파괴 애니메이션을 수행할 오브젝트 생성.
-        var tileWorldPosition = _blocks.CellToWorld(position);
+        try
+        {
+            if (_blocks.HasTile(position) is false)
+            {
+                return;
+            }
 
-        // 블럭 파괴 애니메이션을 수행할 프리팹 생성.
-        var animPosition = new Vector3(tileWorldPosition.x + 0.5f, tileWorldPosition.y + 0.5f, 0);
-        var explosion = Instantiate(explosionPrefab, animPosition, Quaternion.identity);
-        explosion.transform.localScale = new Vector3(_blocks.cellSize.x, _blocks.cellSize.y, 1);
+            // 내부 타일 월드 좌표를 가져와 파괴 애니메이션을 수행할 오브젝트 생성.
+            var tileWorldPosition = _blocks.CellToWorld(position);
 
-        // 내부 타일 제거.
-        _blocks.SetTile(position, null);
+            // 블럭 파괴 애니메이션을 수행할 프리팹 생성.
+            var animPosition = new Vector3(tileWorldPosition.x + 0.5f, tileWorldPosition.y + 0.5f, 0);
+            var explosion = Instantiate(explosionPrefab, animPosition, Quaternion.identity);
+            explosion.transform.localScale = new Vector3(_blocks.cellSize.x, _blocks.cellSize.y, 1);
 
-        _mapBag[blockIndex] = 0;
-        GameInfoService.Instance.RemoveItem(blockIndex);
+            // 내부 타일 제거.
+            _blocks.SetTile(position, null);
+
+            _mapBag[blockIndex] = 0;
+            GameInfoService.Instance.RemoveItem(blockIndex);
 
 
-        // 일정 시간(애니메이션 수행) 후 타일을 삭제
-        StartCoroutine(RemoveTileAfterAnimation(position, blockIndex, explosion));
+            // 일정 시간(애니메이션 수행) 후 타일을 삭제
+            StartCoroutine(RemoveTileAfterAnimation(position, blockIndex, explosion));
+        }
+        catch
+        {
+            // ignore
+        }
     }
 
     public void AddBlackMatter(int locationIndex)
@@ -222,4 +242,7 @@ public class MapGenerator : MonoBehaviour
 
         Destroy(explosion);
     }
+
+    private bool CanRemoveBlock()
+        => GameManager.Instance.GameStatus is GameStatus.Playing or GameStatus.HurryUp;
 }
