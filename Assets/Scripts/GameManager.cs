@@ -195,7 +195,7 @@ public class GameManager : MonoBehaviour
     {
         var playerContexts = _playerManager.GetPlayerContexts();
         // 종료 전 cleanup 호출.
-        var playerForms = playerContexts.Select(player => player.Player).ToList();
+        var playerForms = playerContexts.Where(player => player.Player is not null).Select(player => player.Player).ToList();
         var playerGroups = playerForms.GroupBy(form => form.GetType());
         if (isForcePlayerHostShutdown)
         {
