@@ -44,7 +44,24 @@ class GameLogger:
         self.root_logger.info(message)
 
     def cleanup(self):
+        # 게임 로거 정리
+        if self._game_logger:
+            handlers = self._game_logger.handlers[:]
+            for handler in handlers:
+                handler.close()
+                self._game_logger.removeHandler(handler)
+            self._game_logger = None  # 참조 제거
+
+        # 플레이어 로거 정리
+        for player, player_logger in self._player_loggers.items():
+            handlers = player_logger.handlers[:]
+            for handler in handlers:
+                handler.close()
+                player_logger.removeHandler(handler)
         self._player_loggers.clear()
+
+        # 로거 캐시 해제
+        logging.shutdown()  # logging 모듈의 모든 핸들러 강제 정리
 
     def get_default_logger(self) -> logging.Logger:
         logger = logging.getLogger("default")

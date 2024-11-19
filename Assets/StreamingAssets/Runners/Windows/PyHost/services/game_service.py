@@ -76,3 +76,4 @@ class GameService:
         self._column = 0
         self._row = 0
         self._player_service.clean_up()
+        self._game_logger.cleanup()
