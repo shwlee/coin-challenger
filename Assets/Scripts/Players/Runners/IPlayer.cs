@@ -41,4 +41,8 @@ public interface IPlayer
     /// <param name="currentPosition">현재 플레이어의 위치. map 배열의 인덱스로 표시됨.</param>    
     /// <returns>이번 프레임에 진행할 방향. left, up, right, down 순서오 0, 1, 2, 3 으로 표현.</returns>
     UniTask<int?> MoveNext(int turn, int[] map, int currentPosition);
+
+    UniTask CloseHost();
+
+    UniTask CleanupHost();
 }
