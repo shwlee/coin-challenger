@@ -26,7 +26,7 @@
 &nbsp; 위 게임 영상 보이시져? 저렇게 캐릭터를 이동 시켜 코인을 많이 먹는 게임입니다.    
 &nbsp; - 플레이어 캐릭터를 이동시켜 코인을 가장 많이 획득하는 것이 목표!    
 &nbsp; - 플레이어 캐릭터의 이동은 여러분의 알고리즘 코드로 실행!    
-&nbsp; - C#, javascript, pyhton 중 하나의 프로그래밍 언어로 코드를 작성합니다.    
+&nbsp; - C#, javascript, python 중 하나의 프로그래밍 언어로 코드를 작성합니다.    
 &nbsp; - 알고리즘을 구현한 코드 파일을 게임 실행 폴더에 넣고 게임을 실행하기만 하면 끗!
 
 
@@ -45,7 +45,7 @@
 
 실행하는 방법부터 시작합니다.
 
-> 주의: **Windows 만 지원합니다.**
+> 주의: **Windows / Mac 모두 지원합니다.**
 
 <br>
 
@@ -659,6 +659,9 @@ class Player:
 - 해당 언어에서 built-in 으로 제공되는 기능만 사용할 수 있습니다.    
   (외부 라이브러리, 3rd party 코드 import 등 금지)
 
+- 참조가 타입에 고정 되는 코드는 금지합니다.    
+(C# 의 경우 Player 클래스에서 static 키워드 금지)
+
 - 게임은 순수 알고리즘 작성을 목적으로 합니다. 비동기, 병렬 (스레드와 Task 포함) 코드는 사용을 금지합니다.
 
 - 코드 호출을 대기 시킬 수 있는 코드 사용을 금지합니다.(sleep 호출 금지.)
@@ -688,7 +691,8 @@ class Player:
 
 앞서 언급한 플레이어 호스트는 실행 바이너리로 보관됩니다. 
 
-해당 바이너리의 기본 보관 위치는 `CoinChallenger.exe` 파일을 기준으로 아래의 위치에 있습니다.
+해당 바이너리의 기본 보관 위치는 `CoinChallenger.exe` 파일을 기준으로 아래의 위치에 있습니다.    
+(Windows 바이너리 위치 입니다.)
 
 ```
 // C# host
@@ -707,7 +711,7 @@ class Player:
 
 게임이 정상적으로 종료되면 함께 종료됩니다.
 
-각 호스트의 실행 바이너리 위치는 gameSettings.json 파일을 통해 조정할 수 있습니다.
+각 호스트의 실행 바이너리 위치는 gameSettings.{OS}.json 파일을 통해 조정할 수 있습니다.
 ```
 ./CoinChallenger_Data/StreamingAssets/config/gameSettings.json
 ```
@@ -745,12 +749,20 @@ gameSettings.json 은 호스트 실행 바이너리 위치와 호스트가 사�
 <br>
 <br>
 
-- gameSettings.json
+- gameSettings.{OS}.json
 
-게임 실행에 필요한 정보를 보관하는 configuration 파일입니다. 아래 위치에 보관됩니다.
+gameSettings.{OS}.json 파일은 게임 실행에 필요한 정보를 보관하는 configuration 파일입니다. 아래 위치에 보관됩니다.
 ```
-./CoinChallenger_Data/StreamingAssets/config/gameSettings.json
+./CoinChallenger_Data/StreamingAssets/config/gameSettings.{OS}.json
 ```
+
+최신 release 기준으로 Window / Mac 용 파일이 모두 포함되어 있습니다.
+![alt text](./resources/coin-challenger_configs.png)
+
+기본 설정 내용은 두 파일 모두 동일합니다. 게임 실행 시 현재 OS 에 적합한 파일을 읽어서 게임 인스턴스에 설정을 할당합니다.
+
+만약 설정을 변경할 경우 해당 OS 에 맞는 파일만 수정하면 됩니다.
+
 
 gameSettings.json 파일을 수정한 후 게임을 재시작하면, 수정된 값으로 게임이 진행됩니다.
 
@@ -768,6 +780,21 @@ gameSettings.json 파일을 수정한 후 게임을 재시작하면, 수정된 �
 - Python 호스트 실행 port.(PyHostPort)
 - 게임 종료 시 플레이어 호스트를 함께 종료할 지 여부.(CloseWithoutPlayerHostExit)
 - 게임 랜덤 기믹 사용 여부.(UseRandomGimmick)
+
+// sample gameSettings.{OS}.json
+{
+    "RunningTime" : 120,
+    "CsharpHostPath": "Runners/Windows/CSharpHost/CSharpHost.exe",
+    "CsharpHostport": 50109,
+    "JsHostPath": "Runners/Windows/JsHost/jsHost.exe",
+    "JsHostport": 50209,
+    "CppHostPath": "Runners/Windows/CppHost/CppHost.exe",
+    "CppHostport": 50309,
+    "PyHostPath": "Runners/Windows/PyHost/PyHost.exe",
+    "PyHostport": 50409,
+    "CloseWithoutPlayerHostExit" : true,
+    "UseRandomGimmick" : true
+}
 ```
 
 <br>
@@ -836,7 +863,10 @@ gameSettings.json 에 `UseRandomGimmick` 필드를 true 로 설정하면 게임 
 
 위 맵 기준으로 플레이어가 서 있는 위치와 상하좌우 빈공간 중 2칸 범위의 자리에는 BlackMatter 가 생성되지 않습니다.(생성 금지 위치)   
 전체 플레이어 기준, 각 플레이어의 생성금지위치를 제외한 나머지 빈 공간 중 무작위 4 곳에 BlackMatter 가 생성됩니다.(생성 가능한 공간이 없으면 출현하지 않습니다.)   
-BlackMatter 는 HurryUp 모드가 시작되면 더 이상 출현하지 않습니다. 혹은 그 전에 게임이 종료되어도 출현하지 않습니다.
+BlackMatter 는 HurryUp 모드가 시작되면 더 이상 출현하지 않습니다. 혹은 그 전에 게임이 종료되어도 출현하지 않습니다.    
+HurryUp 모드 진입 시 BlackMatter 역시 삭제 대상이 됩니다.
+
+
 
 
 <br>
@@ -923,7 +953,7 @@ Game Over 후 `RESULT` 화면 ESC 키를 입력해 게임을 종료하면
 log 파일에는 아래 내용이 기록됩니다.
 
 ```
-turn = 게임 내에서 해당 플레이어의 MoveNext() 를 호출한 차례.
+turn = 게임 내에서 해당 플레이어의 MoveNext() 를 호출한 횟수.(몇 번째 턴인지 표시)
 position = 해당 플레이어의 시작 위치.
 map = 위 턴에서 호출된 시점의 map 정보.
 current = 위 턴에서 해당 플레이어의 위치.

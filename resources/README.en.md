@@ -40,7 +40,7 @@ Let’s skip the chatter and get straight to running the game.
 
 Here’s how to start:
 
-> Note: **Only Windows is supported.**
+> Note: **Windows / Mac is supported.**
 
 <br>
 
@@ -623,6 +623,9 @@ When writing the code, there are some important things to consider.
 - Only the built-in functionalities provided by the language can be used.
   (No external libraries or third-party code imports are allowed.)
 
+- Code where references are fixed to a specific type is prohibited.     
+(In the case of C#, the use of the static keyword in the Player class is not allowed.)
+
 - The game is meant to be a pure algorithm implementation. Asynchronous or parallel code (including threads and tasks) is not allowed.
 
 - Code that causes a delay in code execution (e.g., sleep) is prohibited.
@@ -653,6 +656,7 @@ Please focus on writing a pure and highly efficient algorithm (maximize coin sco
 The player host mentioned earlier is stored as an executable binary.
 
 The default storage location of the binary, based on the `CoinChallenger.exe` file, is as follows:
+(The following is the location of the Windows binary.)
 
 ```
 // C# host
@@ -673,7 +677,7 @@ When the game ends normally, it terminates along with it.
 
 The location of each player host executable can be adjusted via the gameSettings.json file.
 ```
-./CoinChallenger_Data/StreamingAssets/config/gameSettings.json
+./CoinChallenger_Data/StreamingAssets/config/gameSettings.{OS}.json
 ```
 
 gameSettings.json stores/adjusts the location of the player host executable and the port information used by the  player host.  
@@ -704,12 +708,20 @@ If player loading fails, press `ESC` to quit the game, and either delete or modi
 <br>
 <br>
 
-- gameSettings.json
+- gameSettings.{OS}.json
 
-gameSettings.json is a configuration file that stores information needed for game execution. It is stored in the following location:
+gameSettings.{OS}.json is a configuration file that stores information needed for game execution. It is stored in the following location:
 ```
-./CoinChallenger_Data/StreamingAssets/config/gameSettings.json
+./CoinChallenger_Data/StreamingAssets/config/gameSettings.{OS}.json
 ```
+
+The latest release includes files for both Windows and Mac.
+
+![alt text](./coin-challenger_configs.png)
+
+The default configuration is identical for both files. When the game runs, it reads the file appropriate for the current OS and assigns the configuration to the game instance
+
+If you need to make changes to the configurations, you only need to modify the file corresponding to your runnging OS.
 
 After modifying the gameSettings.json file, restart the game to proceed with the updated values.
 
@@ -727,6 +739,21 @@ The current values adjustable in gameSettings.json are as follows:
 - Python host execution port (PyHostPort)
 - Whether to terminate player host with game termination (CloseWithoutPlayerHostExit)
 - Whether to use a random gimmick in the game (UseRandomGimmick)
+
+// sample gameSettings.{OS}.json
+{
+    "RunningTime" : 120,
+    "CsharpHostPath": "Runners/Windows/CSharpHost/CSharpHost.exe",
+    "CsharpHostport": 50109,
+    "JsHostPath": "Runners/Windows/JsHost/jsHost.exe",
+    "JsHostport": 50209,
+    "CppHostPath": "Runners/Windows/CppHost/CppHost.exe",
+    "CppHostport": 50309,
+    "PyHostPath": "Runners/Windows/PyHost/PyHost.exe",
+    "PyHostport": 50409,
+    "CloseWithoutPlayerHostExit" : true,
+    "UseRandomGimmick" : true
+}
 ```
 
 <br>
@@ -794,7 +821,8 @@ Every 15 seconds after the game starts, BlackMatter is generated at random locat
 
 Based on the map above, BlackMatter will not be generated in the locations occupied by players or empty spaces within a 2-tile radius of players (restricted locations).  
 Across all players, excluding restricted locations, BlackMatter is generated randomly in four possible locations (if there are no available spaces, it will not be generated).  
-BlackMatter stops appearing when HurryUp mode begins or if the game ends before then.
+BlackMatter stops appearing when HurryUp mode begins or if the game ends before then.    
+When entering HurryUp mode, BlackMatter will also be subject to deletion.
 
 <br>
 <br>
@@ -875,7 +903,7 @@ For each turn, the map information, the player's current position, and the final
 The log file contains the following information:
 
 ```
-turn = The turn number in which the player's MoveNext() was called.
+turn = The number of times the player's MoveNext() has been called in the game (indicates which turn it is)
 position = The starting position of the player.
 map = The map information at the time the turn was called.
 current = The current position of the player during that turn.
