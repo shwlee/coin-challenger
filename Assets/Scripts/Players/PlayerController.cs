@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     private float _moveTime = 0.3f;
     private bool _isMoving = false;
     private Animator _animator;
+    private Animation _errorAnimation;
 
     public int Position;
 
@@ -150,7 +151,10 @@ public class PlayerController : MonoBehaviour
         if (result is null || result == -1)  // null or -1 이면 비정상 결과.
         {
             // 1초 페널티.
+            TriggerErrorAnimation();
+
             await UniTask.Delay(1000);
+
             return null;
         }
         return (MoveDirection)result;
@@ -233,6 +237,18 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
             GameManager.Instance.SetPlayerScore(collision.gameObject, Position, coin.CoinPoint);
         }
+    }
+
+    private void TriggerErrorAnimation()
+    {
+        if (_errorAnimation is null)
+        {
+            var errorObj = gameObject.transform.GetChild(1);
+            errorObj.gameObject.SetActive(true);
+            _errorAnimation = errorObj.GetComponent<Animation>();
+        }
+
+        _errorAnimation.Play();
     }
 
     #region test key input
