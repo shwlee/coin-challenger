@@ -15,10 +15,10 @@ public abstract class PlayerRunnerBase<T> : IPlayer
         Platform = platform;
         HostPath = hostPath;
     }
-    public static UniTask CloseHost()
+    public UniTask CloseHost()
         => RunnerHostMediator.CloseRunner(Port, Platform);
 
-    public static UniTask CleanupHost()
+    public UniTask CleanupHost()
         => RunnerHostMediator.CleanupPlayerHost(Port, Platform);
 
     public UniTask GameSetup(string gameId, int column, int row)

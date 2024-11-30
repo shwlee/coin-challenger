@@ -194,41 +194,35 @@ public class GameManager : MonoBehaviour
     public async UniTask CloseAllPlayerHost(bool isForcePlayerHostShutdown)
     {
         var playerContexts = _playerManager.GetPlayerContexts();
-        // 종료 전 cleanup 호출.
-        var playerForms = playerContexts.Where(player => player.Player is not null).Select(player => player.Player).ToList();
+
+        // 종료 전 cleanup + player host close 호출.
+        var playerForms = playerContexts.Where(player =>
+            player.Player switch
+            {
+                null => false,
+                DummyPlayer => false,
+                _ => true,
+            }).Select(player => player.Player).ToList();
         var playerGroups = playerForms.GroupBy(form => form.GetType());
         if (isForcePlayerHostShutdown)
         {
             Settings.CloseWithoutPlayerHostExit = false;
         }
 
-        foreach (var group in playerGroups)
+        var closeTasks = new List<UniTask>();
+        foreach (var player in playerForms)
         {
-            var platform = group.Key;
-            switch (platform)
+            var task = UniTask.Create(async () =>
             {
-                case Type _ when platform == typeof(CsPlayerRunner):
-                    await CsPlayerRunner.CleanupHost();
-                    await CsPlayerRunner.CloseHost();
-                    break;
-                case Type _ when platform == typeof(JsPlayerRunner):
-                    await JsPlayerRunner.CleanupHost();
-                    await JsPlayerRunner.CloseHost();
-                    break;
-                case Type _ when platform == typeof(CppPlayerRunner):
-                    await CppPlayerRunner.CleanupHost();
-                    await CppPlayerRunner.CloseHost();
-                    break;
-                case Type _ when platform == typeof(PyPlayerRunner):
-                    await PyPlayerRunner.CleanupHost();
-                    await PyPlayerRunner.CloseHost();
-                    break;
-                case Type _ when platform == typeof(DummyPlayer):
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                await player.CleanupHost();
+                await player.CloseHost(); // (CloseWithoutPlayerHostExit 설정이 있을 경우 넘어감.)
+            });
+
+            closeTasks.Add(task);
+
         }
+
+        await UniTask.WhenAll(closeTasks);
     }
 
     void Update()

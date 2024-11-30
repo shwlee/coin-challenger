@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using System;
 using UnityEngine;
 
 public class DummyPlayer : IPlayer
@@ -26,11 +25,14 @@ public class DummyPlayer : IPlayer
     }
 
     public UniTask LoadRunner()
-        => throw new NotImplementedException();
+        => UniTask.CompletedTask;
 
     public UniTask<int?> MoveNext(int turn, int[] map, int currentPosition)
         => UniTask.FromResult<int?>(_random.Next(0, 3));
 
     public UniTask CloseHost()
-        => UniTask.CompletedTask;    
+        => UniTask.CompletedTask;
+
+    public UniTask CleanupHost()
+        => UniTask.CompletedTask;
 }
