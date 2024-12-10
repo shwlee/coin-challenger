@@ -11,24 +11,36 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     private const string ConfigPath = "config";
-    private const string ConfigFile = "gameSettings.json";
+    private const string ConfigFile = "gameSettings.{0}.json";
 
     public static GameManager Instance { get; private set; }
 
     public float runningTimeBeforeHurryUp = 120f; // 기본 120초(2분)이 게임시간. 2분이 경과되면 hurryUp mode.
-    public float hurryUpBlinkingDuration = 0.5F;
+    public float hurryUpBlinkingDuration = 0.5f;
     public Color hurryUpBackground = Color.red;
 
-    public GameStatus GameStatus;
+    private GameStatus _gameStatus;
+
+    public GameStatus GameStatus
+    {
+        get => _gameStatus;
+        set => _gameStatus = value;
+    }
     public GameMode Mode;
+
+    public float startRandomCoin = 15f;
+    public float destroyBlockInterval = 3f;
 
     public GameSettings Settings { get; set; }
 
     private MapGenerator _mapGenerator;
     private PlayerManager _playerManager;
 
+    private string _gameId;
+
     private bool _isHurryUpProcedureStarted;
     private bool _isClosing;
+    private bool _isGimmickRunning;
 
     void Awake()
     {
@@ -70,9 +82,18 @@ public class GameManager : MonoBehaviour
         ExitInputManager.OnCleanExitPressed -= ExitInputManager_OnCleanExitPressed;
     }
 
+    private string GetConfigFileWithPlatform()
+    {
+        string platform = Application.platform == RuntimePlatform.OSXPlayer
+            || Application.platform == RuntimePlatform.OSXEditor
+            ? "mac"
+            : "windows";
+        return string.Format(ConfigFile, platform);
+    }
+
     private void LoadSettings()
     {
-        var path = Path.Combine(Application.streamingAssetsPath, ConfigPath, ConfigFile);
+        var path = Path.Combine(Application.streamingAssetsPath, ConfigPath, GetConfigFileWithPlatform());
         var folder = Path.GetDirectoryName(path);
         if (Directory.Exists(folder) is false)
         {
@@ -88,6 +109,8 @@ public class GameManager : MonoBehaviour
         var json = File.ReadAllText(path);
         var settings = JsonUtility.FromJson<GameSettings>(json);
         Settings = settings;
+
+        _gameId = DateTime.Now.ToString("yyyyMMdd-HHmmss");
     }
 
     private void SaveDefaultGameSettings(string settingFilePath, GameSettings settings)
@@ -150,7 +173,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        await _playerManager.InitPlayer(column, row, playerPositions);
+        await _playerManager.InitPlayer(_gameId, column, row, playerPositions);
     }
 
     public IEnumerable<PlayerContext> GetAllPlayerContexts()
@@ -171,33 +194,35 @@ public class GameManager : MonoBehaviour
     public async UniTask CloseAllPlayerHost(bool isForcePlayerHostShutdown)
     {
         var playerContexts = _playerManager.GetPlayerContexts();
-        // 종료 전 cleanup 호출.
-        var playerForms = playerContexts.Select(player => player.Player).ToList();
+
+        // 종료 전 cleanup + player host close 호출.
+        var playerForms = playerContexts.Where(player =>
+            player.Player switch
+            {
+                null => false,
+                DummyPlayer => false,
+                _ => true,
+            }).Select(player => player.Player).ToList();
         var playerGroups = playerForms.GroupBy(form => form.GetType());
         if (isForcePlayerHostShutdown)
         {
             Settings.CloseWithoutPlayerHostExit = false;
         }
 
-        foreach (var group in playerGroups)
+        var closeTasks = new List<UniTask>();
+        foreach (var player in playerForms)
         {
-            var platform = group.Key;
-            switch (platform)
+            var task = UniTask.Create(async () =>
             {
-                case Type _ when platform == typeof(CsPlayerRunner):
-                    await CsPlayerRunner.CleanupHost();
-                    await CsPlayerRunner.CloseHost();
-                    break;
-                case Type _ when platform == typeof(JsPlayerRunner):
-                    await JsPlayerRunner.CleanupHost();
-                    await JsPlayerRunner.CloseHost();
-                    break;
-                case Type _ when platform == typeof(DummyPlayer):
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                await player.CleanupHost();
+                await player.CloseHost(); // (CloseWithoutPlayerHostExit 설정이 있을 경우 넘어감.)
+            });
+
+            closeTasks.Add(task);
+
         }
+
+        await UniTask.WhenAll(closeTasks);
     }
 
     void Update()
@@ -207,12 +232,15 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        StartRandomGimmick();
+
         CheckPlayTime();
 
-        CheckMouseClickForCoinRemove();
+        CheckMouseClickToRemoveItem();
 
         if (Input.GetKey(KeyCode.Return))
         {
+            GameStatus = GameStatus.GameSet;
             SceneManager.LoadScene("Result");
             return;
         }
@@ -243,40 +271,52 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void CheckMouseClickForCoinRemove()
+    private void CheckMouseClickToRemoveItem()
     {
-        if (Mode == GameMode.Contest) // 마우스 coin 제거는 contest 모드에서는 사용 불가.
+        if (Mode == GameMode.Contest) // 클릭 테스트는 contest 모드에서는 사용 불가.
         {
             return;
         }
 
-        if (Input.GetMouseButtonDown(0) is false)
+        if (Input.GetMouseButtonDown(0)) // 좌클릭은 코인이나 블럭 제거.
         {
-            return;
+            var worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            var hit = Physics2D.Raycast(worldPoint, Vector2.zero);
+            if (hit.collider is not null) // coin
+            {
+                var collision = hit.collider;
+                if (collision.CompareTag("Items"))
+                {
+                    var coin = collision.gameObject;
+
+                    // remove coin
+                    Destroy(coin);
+                    RemoveCoin(coin);
+                }
+
+                return;
+            }
+
+            // block
+            var index = CoordinateService.ToIndex(_mapGenerator.column, _mapGenerator.row, worldPoint);
+
+            _mapGenerator.RemoveBlock(index);
         }
 
-        var worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        var hit = Physics2D.Raycast(worldPoint, Vector2.zero);
-        if (hit.collider == null)
+        if (Input.GetMouseButtonDown(1)) // 우클릭은 blackMatter 생성.
         {
-            return;
-        }
+            var worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            var index = CoordinateService.ToIndex(_mapGenerator.column, _mapGenerator.row, worldPoint);
 
-        var collision = hit.collider;
-        if (collision.CompareTag("Items"))
-        {
-            var coin = collision.gameObject;
-
-            // remove coin
-            Destroy(coin);
-            RemoveCoin(coin);
+            _mapGenerator.AddBlackMatter(index);
         }
     }
 
     private void RemoveCoin(GameObject coin)
     {
         var coinIndex = CoordinateService.ToIndex(_mapGenerator.column, _mapGenerator.row, coin.transform.position);
-        GameInfoService.Instance.RemoveCoinByIndex(coinIndex);
+        GameInfoService.Instance.RemoveItem(coinIndex);
     }
 
     private void GoHurryUp()
@@ -358,6 +398,106 @@ public class GameManager : MonoBehaviour
         yield return null;
     }
 
+    private void StartRandomGimmick()
+    {
+        if (GameStatus is not GameStatus.Playing)
+        {
+            return;
+        }
+
+        if (_isGimmickRunning)
+        {
+            return;
+        }
+
+        if (Settings.UseRandomGimmick is false)
+        {
+            return;
+        }
+
+        _isGimmickRunning = true;
+
+        // gimmick 수행.
+        StartCoroutine(RunDestroyBlocksGimmick());
+        StartCoroutine(GenerateRandomBlackMatter());
+    }
+
+    /// <summary>
+    /// 지정된 시간 간격으로 랜덤하게 block 을 파괴한다.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator RunDestroyBlocksGimmick()
+    {
+        yield return new WaitForSeconds(destroyBlockInterval);
+
+        while (GameInfoService.Instance.IsClearAllCoins() is false)
+        {
+            if (GameStatus is GameStatus.GameSet)
+            {
+                yield break;
+            }
+
+            // random 으로 block 파괴.
+            var removeBlock = GameInfoService.Instance.GetRandomBlockIndex();
+            if (removeBlock is -1) // 선택 가능한 block 이 없음.
+            {
+                yield break;
+            }
+
+            if (GameStatus is GameStatus.GameSet)
+            {
+                yield break;
+            }
+
+            _mapGenerator.RemoveBlock(removeBlock);
+
+            yield return new WaitForSeconds(destroyBlockInterval);
+        }
+
+        yield return null;
+    }
+
+    /// <summary>
+    /// 지정된 시간 간격이 되면 blackMatter 4개를 빈 자리에 생성한다.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator GenerateRandomBlackMatter()
+    {
+        while (GameStatus is GameStatus.Playing)
+        {
+            yield return new WaitForSeconds(startRandomCoin);
+
+            if (GameStatus is not GameStatus.Playing)
+            {
+                yield break;
+            }
+
+            if (GameInfoService.Instance.IsClearAllCoins()) // 방어처리
+            {
+                yield break;
+            }
+
+            var playerPositions = _playerManager.GetAllPlayersPositions();
+            var emptyTiles = GameInfoService.Instance.GetRandomEmptyTiles(4, playerPositions); // 4 개만 생성한다.
+            if (emptyTiles.Length is 0)
+            {
+                continue;
+            }
+
+            foreach (var tilePosition in emptyTiles)
+            {
+                if (GameStatus is GameStatus.GameSet) // 방어 처리.
+                {
+                    yield break;
+                }
+
+                _mapGenerator.AddBlackMatter(tilePosition);
+            }
+        }
+
+        yield return null;
+    }
+
     private IEnumerator RemoveCoins(CoinType coinType, float delayTime)
     {
         var randomCoins = GameInfoService.Instance.GetRandomCoinIndexes(coinType);
@@ -366,15 +506,15 @@ public class GameManager : MonoBehaviour
             yield break;
         }
 
-        foreach (var blackMatter in randomCoins)
+        foreach (var coin in randomCoins)
         {
-            var removeResult = _mapGenerator.RemoveCoin(blackMatter);
+            var removeResult = _mapGenerator.RemoveCoin(coin);
             if (removeResult is CoinActionResult.NotExists) // 이미 지워졌으면 다음 코인 삭제 시도.
             {
                 continue;
             }
 
-            GameInfoService.Instance.RemoveCoinByIndex(blackMatter);
+            GameInfoService.Instance.RemoveItem(coin);
             yield return new WaitForSeconds(delayTime);
         }
     }

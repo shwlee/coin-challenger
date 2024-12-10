@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6727803133846456982}
   - component: {fileID: 6696112404815940431}
   - component: {fileID: 930259721275895654}
-  - component: {fileID: 984381982842858709}
+  - component: {fileID: 2818967632409078957}
   m_Layer: 7
   m_Name: BlackMatter
   m_TagString: Items
@@ -171,7 +171,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &984381982842858709
+--- !u!114 &2818967632409078957
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5528919776007726835}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c147b23e0b74454ba7f43eeb763f5cb, type: 3}
+  m_Script: {fileID: 11500000, guid: 20ac9253c1b415d4eadf780191a955b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   type: 500

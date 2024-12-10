@@ -77,3 +77,23 @@ crashlytics-build.properties
 
 # nuget packages
 /[Aa]ssets/[Pp]ackages
+
+# Mac OS 관련 파일 무시
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+*.swp
+._*
+.SafariSavedState
+.AppleDouble
+.DocumentRevisions-V100
+.fseventsd
+.metadata_never_index
+.VolumeIcon.icns
+.icon?
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk

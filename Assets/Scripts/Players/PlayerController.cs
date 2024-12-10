@@ -15,10 +15,13 @@ public class PlayerController : MonoBehaviour
     private float _moveTime = 0.3f;
     private bool _isMoving = false;
     private Animator _animator;
+    private Animation _errorAnimation;
 
     public int Position;
 
     private int PaneltyDelay => (int)(_moveTime * 1000);
+
+    private int _turn;
 
     public async void SetPlayerModule(IPlayer module)
     {
@@ -76,12 +79,11 @@ public class PlayerController : MonoBehaviour
 
         _isMoving = true;
 
-        var (column, row, map) = GameInfoService.Instance.GetMapInfo();
-        var x = RoundToHalf(transform.position.x);
-        var y = RoundToHalf(transform.position.y);
-        var current = CoordinateService.ToIndex(column, row, x, y);
+        _turn++;
 
-        var direction = IsTestMode() is false ? await CalcToWhere(map, current) : GetDirectionByInput();
+        var (column, row, map) = GameInfoService.Instance.GetMapInfo();
+        var current = GetCurrentPosition(column, row);
+        var direction = IsTestMode() is false ? await CalcToWhere(_turn, map, current) : GetDirectionByInput();
 
         if (direction is null)
         {
@@ -110,6 +112,26 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public int GetPlayerPositionIndex()
+        => GetCurrentPosition();
+
+    private int GetCurrentPosition()
+    {
+        var (column, row) = GameInfoService.Instance.GetMapRange();
+        var x = RoundToHalf(transform.position.x);
+        var y = RoundToHalf(transform.position.y);
+        var current = CoordinateService.ToIndex(column, row, x, y);
+        return current;
+    }
+
+    private int GetCurrentPosition(int column, int row)
+    {
+        var x = RoundToHalf(transform.position.x);
+        var y = RoundToHalf(transform.position.y);
+        var current = CoordinateService.ToIndex(column, row, x, y);
+        return current;
+    }
+
     private bool IsTestMode()
         => GameManager.Instance.Mode is GameMode.Test;
 
@@ -122,14 +144,17 @@ public class PlayerController : MonoBehaviour
     /// <param name="map"></param>
     /// <param name="current"></param>
     /// <returns></returns>
-    private async UniTask<MoveDirection?> CalcToWhere(int[] map, int current)
+    private async UniTask<MoveDirection?> CalcToWhere(int turn, int[] map, int current)
     {
         // 요기서 사용자 알고리즘 함수 호출.
-        var result = await _player.MoveNext(map, current);
+        var result = await _player.MoveNext(turn, map, current);
         if (result is null || result == -1)  // null or -1 이면 비정상 결과.
         {
             // 1초 페널티.
+            TriggerErrorAnimation();
+
             await UniTask.Delay(1000);
+
             return null;
         }
         return (MoveDirection)result;
@@ -212,6 +237,18 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
             GameManager.Instance.SetPlayerScore(collision.gameObject, Position, coin.CoinPoint);
         }
+    }
+
+    private void TriggerErrorAnimation()
+    {
+        if (_errorAnimation is null)
+        {
+            var errorObj = gameObject.transform.GetChild(1);
+            errorObj.gameObject.SetActive(true);
+            _errorAnimation = errorObj.GetComponent<Animation>();
+        }
+
+        _errorAnimation.Play();
     }
 
     #region test key input

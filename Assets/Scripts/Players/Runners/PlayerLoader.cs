@@ -9,7 +9,8 @@ public static class PlayerLoader
     {
         { ".cs", (position, path) => LoadCSharpRunner(position, path) },
         { ".js", (position,path) => LoadJsRunner(position, path) },
-        //{ ".py", (position,path) => LoadPyRunner(position, path) }, // TODO : python 추가 전까지 봉인.
+        { ".cpp", (position,path) => LoadCppRunner(position, path) },
+        { ".py", (position,path) => LoadPyRunner(position, path) }
     };
 
     public async static UniTask<IPlayer> Load(int position, string path)
@@ -30,9 +31,11 @@ public static class PlayerLoader
     private static UniTask<IPlayer> LoadJsRunner(int position, string path)
         => GeneratePlayer<JsPlayerRunner>(position, path);
 
-    // TODO : python 추가 전까지 봉인.
-    //private static UniTask<IPlayer> LoadPyRunner(int position, string path)
-    //    => GeneratePlayer<PyPlayerRunner>(position, path);
+    private static UniTask<IPlayer> LoadCppRunner(int position, string path)
+        => GeneratePlayer<CppPlayerRunner>(position, path);
+
+    private static UniTask<IPlayer> LoadPyRunner(int position, string path)
+        => GeneratePlayer<PyPlayerRunner>(position, path);
 
     private async static UniTask<IPlayer> GeneratePlayer<T>(int position, string path) where T : IPlayer, new()
     {

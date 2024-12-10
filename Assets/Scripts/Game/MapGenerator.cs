@@ -1,3 +1,7 @@
+using Assets.Scripts.Game;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,6 +20,15 @@ public class MapGenerator : MonoBehaviour
 
     public int column;
     public int row;
+
+    public GameObject explosionPrefab;
+
+    public GameObject blackMatterPrefab;
+
+    /// <summary>
+    /// 폭발 애니메이션 완료 시간을 기다리는 시간. 기본 1초
+    /// </summary>
+    private float _explosionDuration = 1f;
 
     /// <summary>
     /// left top position
@@ -37,9 +50,18 @@ public class MapGenerator : MonoBehaviour
     /// </summary>
     public Vector2 p4Position;
 
+    /// <summary>
+    /// prefab 으로 부터 로딩된 map 인스턴스.
+    /// </summary>
+    private GameObject _loadedMap;
+
     private Tilemap _blocks;
 
+    private List<BlockContext> _blockPositions = new();
+
     private int[] _mapBag;
+
+    private Color _transparentColor = new Color(1, 1, 1, 0.0f);
 
     /// <summary>
     /// 생성된 map 을 읽어서 map 정보를 추출, 보관한다.
@@ -58,15 +80,16 @@ public class MapGenerator : MonoBehaviour
         }
 
         var mapStructure = _map.GetComponent<MapStructure>();
-        Instantiate(_map); // TODO : map 선택해서 로딩 가능하도록.		
+        _loadedMap = Instantiate(_map); // TODO : map 선택해서 로딩 가능하도록.		
 
-        var grid = _map.GetComponent<Grid>();
-        var tilemaps = grid.gameObject.GetComponentsInChildren<Tilemap>();
+        var grid = _loadedMap.GetComponent<Grid>();
+        var tilemaps = _loadedMap.GetComponentsInChildren<Tilemap>();
         _blocks = tilemaps[1];
 
         column = mapStructure.column;
         row = mapStructure.row;
         _mapBag = new int[column * row];
+
 
         var blockers = _blocks.cellBounds.allPositionsWithin;
         foreach (var position in blockers)
@@ -77,8 +100,9 @@ public class MapGenerator : MonoBehaviour
             }
 
             // blocks 는 map 의 자식 좌표이므로 anchor 를 0으로 계산해야한다.
-            var bagIndex = CoordinateService.ToIndex(column, row, position.x, position.y, 0);
+            var bagIndex = CoordinateService.ToIndex(column, row, position.x + 0.5f, position.y + 0.5f);
             _mapBag[bagIndex] = -1;
+            _blockPositions.Add(new BlockContext { Index = bagIndex, Position = position });
         }
 
         InitPlayerPoistion();
@@ -145,4 +169,81 @@ public class MapGenerator : MonoBehaviour
 
         return CoinActionResult.Deleted;
     }
+
+    public void RemoveBlock(int blockIndex)
+    {
+        if (CanRemoveBlock() is false)
+        {
+            return;
+        }
+
+        var blockContext = _blockPositions.FirstOrDefault(context => context.Index == blockIndex);
+        if (blockContext is null)
+        {
+            return;
+        }
+
+        _blockPositions.Remove(blockContext);
+
+        var position = blockContext.Position;
+
+        // control 객체 접근 전 더블 췍
+        if (CanRemoveBlock() is false)
+        {
+            return;
+        }
+
+        try
+        {
+            if (_blocks.HasTile(position) is false)
+            {
+                return;
+            }
+
+            // 내부 타일 월드 좌표를 가져와 파괴 애니메이션을 수행할 오브젝트 생성.
+            var tileWorldPosition = _blocks.CellToWorld(position);
+
+            // 블럭 파괴 애니메이션을 수행할 프리팹 생성.
+            var animPosition = new Vector3(tileWorldPosition.x + 0.5f, tileWorldPosition.y + 0.5f, 0);
+            var explosion = Instantiate(explosionPrefab, animPosition, Quaternion.identity);
+            explosion.transform.localScale = new Vector3(_blocks.cellSize.x, _blocks.cellSize.y, 1);
+
+            // 내부 타일 제거.
+            _blocks.SetTile(position, null);
+
+            _mapBag[blockIndex] = 0;
+            GameInfoService.Instance.RemoveItem(blockIndex);
+
+
+            // 일정 시간(애니메이션 수행) 후 타일을 삭제
+            StartCoroutine(RemoveTileAfterAnimation(position, blockIndex, explosion));
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    public void AddBlackMatter(int locationIndex)
+    {
+        var coordinate = CoordinateService.ToUnity2dCoordinate(column, row, locationIndex);
+        var position = new Vector3(coordinate.x, coordinate.y, 0);
+        var blackMatter = Instantiate(blackMatterPrefab, position, Quaternion.identity);
+        var blackMatterContext = blackMatter.GetComponent<CoinBlackMatterContext>();
+        blackMatterContext.InitializeInRuntime();
+
+        _mapBag[locationIndex] = 500;
+
+        GameInfoService.Instance.AddBlackMatter(locationIndex);
+    }
+
+    private IEnumerator RemoveTileAfterAnimation(Vector3Int tilePosition, int blockIndex, GameObject explosion)
+    {
+        yield return new WaitForSeconds(_explosionDuration);
+
+        Destroy(explosion);
+    }
+
+    private bool CanRemoveBlock()
+        => GameManager.Instance.GameStatus is GameStatus.Playing or GameStatus.HurryUp;
 }

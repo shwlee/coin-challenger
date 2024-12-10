@@ -1,4 +1,5 @@
 {
     "dotnet.preferCSharpExtension": true,
-    "FSharp.suggestGitignore": false
+    "FSharp.suggestGitignore": false,
+    "dotnet.defaultSolution": "disable"
 }

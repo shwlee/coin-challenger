@@ -1,11 +1,13 @@
 using Cysharp.Threading.Tasks;
-using System;
 using UnityEngine;
 
 public class DummyPlayer : IPlayer
 {
     private System.Random _random = new System.Random();
     private int _myNumber;
+
+    public UniTask GameSetup(string gameId, int column, int row)
+        => UniTask.CompletedTask;
 
     public UniTask Setup(int myPostion, string path)
     {
@@ -23,11 +25,14 @@ public class DummyPlayer : IPlayer
     }
 
     public UniTask LoadRunner()
-        => throw new NotImplementedException();
+        => UniTask.CompletedTask;
 
-    public UniTask<int?> MoveNext(int[] map, int currentPosition)
+    public UniTask<int?> MoveNext(int turn, int[] map, int currentPosition)
         => UniTask.FromResult<int?>(_random.Next(0, 3));
 
     public UniTask CloseHost()
+        => UniTask.CompletedTask;
+
+    public UniTask CleanupHost()
         => UniTask.CompletedTask;
 }

@@ -15,12 +15,14 @@ public abstract class PlayerRunnerBase<T> : IPlayer
         Platform = platform;
         HostPath = hostPath;
     }
-
-    public static UniTask CloseHost()
+    public UniTask CloseHost()
         => RunnerHostMediator.CloseRunner(Port, Platform);
 
-    public static UniTask CleanupHost()
+    public UniTask CleanupHost()
         => RunnerHostMediator.CleanupPlayerHost(Port, Platform);
+
+    public UniTask GameSetup(string gameId, int column, int row)
+     => RunnerHostMediator.SetCurrentGame(Port, Platform, gameId, column, row);
 
     public UniTask<string> GetName()
         => RunnerHostMediator.GetPlayerName(Port, Platform, _myNumber);
@@ -28,8 +30,8 @@ public abstract class PlayerRunnerBase<T> : IPlayer
     public UniTask Initialize(int column, int row)
         => RunnerHostMediator.InitializePlayer(Port, Platform, _myNumber, column, row);
 
-    public UniTask<int?> MoveNext(int[] map, int currentPosition)
-        => RunnerHostMediator.GetMoveNextDirection(Port, Platform, _myNumber, map, currentPosition);
+    public UniTask<int?> MoveNext(int turn, int[] map, int currentPosition)
+        => RunnerHostMediator.GetMoveNextDirection(Port, Platform, _myNumber, turn, map, currentPosition);
 
     public async virtual UniTask Setup(int myNumber, string filePath)
     {

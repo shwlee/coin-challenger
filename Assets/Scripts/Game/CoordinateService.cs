@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public static class CoordinateService
@@ -19,19 +20,20 @@ public static class CoordinateService
 
     private static int CovertToIndex(int column, int row, float x, float y, float anchor = 0.5f)
     {
-        x -= anchor;
-        y -= anchor;
 
-        var rMax = (row / 2);
-        var cHalf = (column / 2);
+       // 그리드의 절대적 좌표를 기준으로 계산
+        int width = (int)Math.Floor(x + column / 2.0); // x축은 좌우로 펼쳐지므로 2로 나눔
+        int height = (int)Math.Floor(row / 2.0 - y); // y축은 위아래로 움직이므로 반대로 처리
 
-        var xi = cHalf + x;
-        var yi = column * (rMax - y - 1);
+        // 범위를 벗어나는 경우 처리
+        width = Math.Clamp(width, 0, column - 1);
+        height = Math.Clamp(height, 0, row - 1);
 
-        return (int)(xi + yi);
+        // 1차원 인덱스 계산
+        return height * column + width;
     }
 
-    public static (float x, float y) ToUnity2dCoordiate(int column, int row, int index, float anchor = 0.5f)
+    public static (float x, float y) ToUnity2dCoordinate(int column, int row, int index, float anchor = 0.5f)
     {
         var cMin = -(column / 2);
         var rMax = (row / 2) - 1;
