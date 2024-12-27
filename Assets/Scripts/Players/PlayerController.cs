@@ -138,7 +138,17 @@ public class PlayerController : MonoBehaviour
 
         // block hit animation 수행.
         _animator.SetInteger("MoveDirection", -1);
-        _animator.SetTrigger("HitDown");
+        
+        var trigger = direction switch
+        {
+            0 => "HitLeft",
+            1 => "HitUp",
+            2 => "HitRight",
+            3 => "HitDown",
+            _ => throw new NotImplementedException()
+        };
+        
+        _animator.SetTrigger(trigger);
 
     }
 
