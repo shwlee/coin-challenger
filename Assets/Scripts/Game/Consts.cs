@@ -23,6 +23,14 @@ public static class Consts
     public const string Python = "py";
 }
 
+public static class HitBlockDirection
+{
+    public const string Left = "HitLeft";
+    public const string Up = "HitUp";
+    public const string Right = "HitRight";
+    public const string Down = "HitDown";
+}
+
 public enum GameStatus
 {
     BeforeStart,

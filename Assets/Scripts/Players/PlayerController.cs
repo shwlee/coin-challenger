@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
-using System.Reflection;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -141,10 +140,10 @@ public class PlayerController : MonoBehaviour
         
         var trigger = direction switch
         {
-            0 => "HitLeft",
-            1 => "HitUp",
-            2 => "HitRight",
-            3 => "HitDown",
+            0 => HitBlockDirection.Left,
+            1 => HitBlockDirection.Up,
+            2 => HitBlockDirection.Right,
+            3 => HitBlockDirection.Down,
             _ => throw new NotImplementedException()
         };
         
