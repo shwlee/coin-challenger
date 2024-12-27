@@ -65,3 +65,11 @@ public enum CoinActionResult
     NotExists,
     Deleted,
 }
+
+public enum MovingArea
+{
+    None,
+    Ground,
+    Block,
+    Wall
+}

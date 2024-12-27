@@ -40,7 +40,7 @@ public class GameInfoService
 
     private void RemoveItemByIndex(int index)
     {
-        Debug.Log($"GameInfoService.RemoveItemByIndex. index:{index}");
+        //Debug.Log($"GameInfoService.RemoveItemByIndex. index:{index}");
 
         _mapBag[index] = 0;
 
@@ -116,8 +116,6 @@ public class GameInfoService
         }
 
         var blockIndex = blockIndexes.OrderBy(x => _random.Next()).Take(1).FirstOrDefault();
-        Debug.Log($"select block index to remove. block:{blockIndex}");
-
         return blockIndex;
     }
 

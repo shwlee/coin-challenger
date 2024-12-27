@@ -6670,7 +6670,7 @@ GameObject:
   - component: {fileID: 6918779156734471887}
   m_Layer: 6
   m_Name: OutBarrier
-  m_TagString: Untagged
+  m_TagString: OutBarrier
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7996,7 +7996,7 @@ GameObject:
   - component: {fileID: 3464307623285776812}
   m_Layer: 6
   m_Name: Blocks
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
+using System.Reflection;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private int PaneltyDelay => (int)(_moveTime * 1000);
 
     private int _turn;
+    private int _lastDirection = 3;
 
     public async void SetPlayerModule(IPlayer module)
     {
@@ -96,20 +98,48 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        SetMoveAnimation((int)direction);
-
         var moveTo = ConvertFromDirection(direction.Value);
-        if (CanMoveNext(moveTo) is false)
+
+        var moveDirection = (int)direction;
+        SetMoveAnimation(moveDirection);
+
+        var frontPath = GetFrontPath(moveTo);
+        switch (frontPath)
         {
-            await UniTask.Delay(PaneltyDelay);
-            _isMoving = false;
-            return;
+            case MovingArea.Ground:
+                break;
+            case MovingArea.None: // error or panelty
+            case MovingArea.Wall:
+            case MovingArea.Block:
+
+                // TODO : block 일 경우 block 깨기 처리.
+                if (frontPath is MovingArea.Block)
+                {
+                    await TryCrackBlock(moveDirection);
+                }
+
+                await UniTask.Delay(PaneltyDelay);
+                _isMoving = false;
+
+                _animator.SetInteger("MoveDirection", _lastDirection);
+                return;
         }
+
 
         if (gameObject.activeSelf)
         {
             StartCoroutine(MoveSmoothGrid(moveTo));
         }
+    }
+
+    private async UniTask TryCrackBlock(int direction)
+    {
+        // TODO : block hit 처리.
+
+        // block hit animation 수행.
+        _animator.SetInteger("MoveDirection", -1);
+        _animator.SetTrigger("HitDown");
+
     }
 
     public int GetPlayerPositionIndex()
@@ -135,8 +165,33 @@ public class PlayerController : MonoBehaviour
     private bool IsTestMode()
         => GameManager.Instance.Mode is GameMode.Test;
 
+    private MovingArea GetFrontPath(Vector2 direction)
+    {
+        var hit = Physics2D.Raycast(transform.position, direction, _layDistance, _hitBlockMask);
+        if (hit.transform is null)
+        {
+            return MovingArea.Ground;
+        }
+
+        var area = hit.transform.gameObject.tag;
+        switch (area)
+        {
+            case "OutBarrier":
+                return MovingArea.Wall;
+            case "Block":
+                return MovingArea.Block;
+            default:
+                return MovingArea.None;
+        }
+    }
+
     private bool CanMoveNext(Vector2 direction)
-        => Physics2D.Raycast(transform.position, direction, _layDistance, _hitBlockMask).transform is null;
+    {
+        var hit = Physics2D.Raycast(transform.position, direction, _layDistance, _hitBlockMask);
+        return hit.transform is null;
+
+    }
+
 
     /// <summary>
     /// 사용자 함수 호출. 비동기로 수행하여 main thread 에 영향을 주지 않게 처리한다.
@@ -219,6 +274,8 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+
+        _lastDirection = direction;
 
         _animator.SetInteger("MoveDirection", direction);
     }

@@ -23,6 +23,15 @@ TextureImporter:
   - first:
       213: 3665269044523063359
     second: PlayerHitDown_6
+  - first:
+      213: 7743233824693484058
+    second: PlayerHitDown_7
+  - first:
+      213: 1722902423687383836
+    second: PlayerHitDown_8
+  - first:
+      213: -8778178673909082984
+    second: PlayerHitDown_9
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -271,11 +280,77 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: PlayerHitDown_7
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1af4ad532e757b60800000000000000
+      internalID: 7743233824693484058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerHitDown_8
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1bcb8240aaf8e710800000000000000
+      internalID: 1722902423687383836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerHitDown_9
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8945dbe3105ad2680800000000000000
+      internalID: -8778178673909082984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: ee44768f3050caa4d894c3023d88e0f6
+    spriteID: 26feeeac352b0f343b9254c277f1a7b3
     internalID: 0
     vertices: []
     indices: 
@@ -292,6 +367,9 @@ TextureImporter:
       PlayerHitDown_4: -2428511419533925361
       PlayerHitDown_5: 1339437522741639715
       PlayerHitDown_6: 3665269044523063359
+      PlayerHitDown_7: 7743233824693484058
+      PlayerHitDown_8: 1722902423687383836
+      PlayerHitDown_9: -8778178673909082984
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
